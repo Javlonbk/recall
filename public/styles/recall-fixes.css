@@ -1,0 +1,55 @@
+/* recall-fixes.css — small post-design patches, loaded AFTER recall.css.
+   Kept separate so recall.css stays byte-identical to the Claude Design export. */
+
+/* Profile popover (admin/edit mode): the admin/actions/form rows are flex
+   containers whose children default to min-width:auto, so "Done editing" +
+   "Sign out admin" + the Save form overflowed the fixed 264px popover and
+   spilled off the right edge of the screen. Let rows shrink, and stack the
+   two admin buttons vertically so they always fit. */
+.pp-admin { flex-direction: column; }
+.pp-admin .pp-mut { flex: none; }
+.pp-actions button { min-width: 0; }
+.pp-form { flex-wrap: wrap; }
+.pp-form input { min-width: 0; }
+
+/* Pointer drag-sort (edit mode): prevent text selection while dragging and
+   show grab affordances. Pairs with recall-fixes.js. */
+body.is-editing .toc-group,
+body.is-editing .toc-sub,
+body.is-editing .card { -webkit-user-select: none; user-select: none; }
+body.is-editing .toc-toprow,
+body.is-editing .tree .toc-sub { cursor: grab; }
+body.rcefx-dragging, body.rcefx-dragging * { cursor: grabbing !important; }
+.rcefx-drag { opacity: .5; }
+
+/* Keep the topic name on one line: when the hover edit controls (rename/＋/✕)
+   appear they squeeze .tt-name, which had no nowrap and wrapped to two lines,
+   growing the row and shoving the other topics. Truncate instead. */
+.toc-topic .tt-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Styled prompt/confirm dialogs (window.uiPrompt / uiConfirm in recall-fixes.js).
+   Reuse the design's .ed-* modal; just a narrower panel, a message line, and a
+   danger (delete) button variant. */
+.ed-panel.ed-panel--sm { max-width: 440px; }
+.ed-panel--sm .ed-body { padding-bottom: 4px; }
+.ed-body .ed-msg { margin: 2px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
+.ed-save.ed-danger { background: #b3401f; }
+.ed-save.ed-danger:hover { background: #9a3618; }
+
+/* Home: the design stacks 7vh padding + 14vh hero margin + 8vh before the list,
+   leaving a large empty gap above the wordmark. Tighten the vertical rhythm. */
+.home { padding-top: 4vh; }
+.home-hero { margin-top: 5vh; }
+.home-links { margin-top: 6vh; }
+
+/* Edit-mode export/save bar (recall-fixes.js): only shown while editing. */
+.rcefx-export { position: fixed; right: 18px; bottom: 18px; z-index: 8000; display: flex; gap: 8px; }
+.rcefx-xbtn {
+  font: 600 12.5px/1 var(--sans, system-ui); cursor: pointer; white-space: nowrap;
+  padding: 9px 14px; border-radius: 999px; border: 1px solid var(--rule, #ddd);
+  background: var(--paper, #fff); color: var(--ink, #222); box-shadow: var(--shadow, 0 6px 22px rgba(0,0,0,.16));
+}
+.rcefx-xbtn:hover { border-color: var(--accent, #b8741a); color: var(--accent, #b8741a); }
+.rcefx-xbtn.rcefx-xprimary { background: var(--accent, #b8741a); color: #fff; border-color: transparent; }
+.rcefx-xbtn.rcefx-xprimary:hover { color: #fff; filter: brightness(1.06); }
+.rcefx-xbtn:disabled { opacity: .6; cursor: default; }

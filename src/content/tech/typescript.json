@@ -1,0 +1,32 @@
+{
+  "name": "TypeScript",
+  "blurb": "JavaScript with a type system — annotations, inference, and generics.",
+  "order": 1,
+  "topics": [
+    {
+      "id": "sample",
+      "name": "Sample Topic",
+      "subtopics": [
+        {
+          "id": "basics",
+          "name": "Basics",
+          "cards": [
+            {
+              "question": "Is this a sample TypeScript card?",
+              "answer": "<p class=\"answer-line\">Yes — this is placeholder content so you can see how TypeScript looks. Replace it via edit mode or the JSON.</p>\n<pre><code>// sample\nconsole.log(\"hello from TypeScript\");</code></pre>",
+              "long": false,
+              "tag": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "book": [
+    {
+      "id": "intro",
+      "title": "Introduction",
+      "html": "<p>Placeholder TypeScript book section. The Book is the long-form reference; add real chapters later.</p>"
+    }
+  ]
+}
