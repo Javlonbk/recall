@@ -1,0 +1,26 @@
+---
+import { getRecallData } from '../lib/content';
+const { title } = Astro.props;
+const { order, content } = getRecallData();
+---
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<link rel="stylesheet" href="/styles/recall.css" />
+<link rel="stylesheet" href="/styles/recall-fixes.css" />
+</head>
+<body>
+<slot />
+
+<script is:inline define:vars={{ content, order }}>
+  window.RECALL_CONTENT = content;
+  window.RECALL_ORDER = order;
+</script>
+<script is:inline src="/scripts/recall.js"></script>
+<script is:inline src="/scripts/recall-fixes.js"></script>
+</body>
+</html>

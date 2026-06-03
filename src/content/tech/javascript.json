@@ -1,0 +1,32 @@
+{
+  "name": "JavaScript",
+  "blurb": "The language of the web — types, scope, closures, and the event loop.",
+  "order": 0,
+  "topics": [
+    {
+      "id": "sample",
+      "name": "Sample Topic",
+      "subtopics": [
+        {
+          "id": "basics",
+          "name": "Basics",
+          "cards": [
+            {
+              "question": "Is this a sample JavaScript card?",
+              "answer": "<p class=\"answer-line\">Yes — this is placeholder content so you can see how JavaScript looks. Replace it via edit mode or the JSON.</p>\n<pre><code>// sample\nconsole.log(\"hello from JavaScript\");</code></pre>",
+              "long": false,
+              "tag": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "book": [
+    {
+      "id": "intro",
+      "title": "Introduction",
+      "html": "<p>Placeholder JavaScript book section. The Book is the long-form reference; add real chapters later.</p>"
+    }
+  ]
+}
