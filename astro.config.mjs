@@ -2,6 +2,8 @@ import { defineConfig } from 'astro/config';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // Dev-only "Save to file" endpoint, implemented as a Vite dev-server middleware
 // so it exists ONLY while running `astro dev` — the production build ships none
 // of it. The in-page editor POSTs storage-shape JSON here to write
@@ -37,9 +39,13 @@ function contentSaveApi() {
 
 export default defineConfig({
   site: 'https://recalldev.pages.dev',
+
   // Emit page.html files so the design's links (qa.html, book.html…) resolve.
   build: { format: 'file' },
+
   // Astro's built-in dev overlay is noise for this project; hide it.
   devToolbar: { enabled: false },
+
   vite: { plugins: [contentSaveApi()] },
+  adapter: cloudflare()
 });
