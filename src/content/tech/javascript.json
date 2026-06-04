@@ -2,18 +2,103 @@
   "name": "JavaScript",
   "blurb": "The language of the web — types, scope, closures, and the event loop.",
   "order": 0,
+  "updated": "2026-06-05",
   "topics": [
     {
       "id": "sample",
-      "name": "Sample Topic",
+      "name": "Introduction",
       "subtopics": [
         {
           "id": "basics",
-          "name": "Basics",
+          "name": "The Language",
           "cards": [
             {
-              "question": "Is this a sample JavaScript card?",
-              "answer": "<p class=\"answer-line\">Yes — this is placeholder content so you can see how JavaScript looks. Replace it via edit mode or the JSON.</p>\n<pre><code>// sample\nconsole.log(\"hello from JavaScript\");</code></pre>",
+              "question": "What is the JavaScript",
+              "answer": "<p class=\"answer-line\">A <b>high-level scripting language</b> originally built to make web pages interactive.</p>\n<p><b>High-level</b> — abstracts away hardware. You write human-readable logic; the engine handles memory, CPU, and binary translation.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n  <thead><tr><th>Level</th><th>Examples</th></tr></thead>\n  <tbody>\n    <tr><td>High</td><td class=\"mono\">JavaScript, Python, Java, C#</td></tr>\n    <tr><td>Low</td><td class=\"mono\">Assembly, C, C++</td></tr>\n  </tbody>\n</table></div>\n<br>\n<p><b>Script</b> — plain-text instructions executed directly by the engine. No compilation, no build step.</p>\n<pre><code>// script.js — runs top to bottom as-is\nconsole.log(\"Hello\");   // engine reads and executes immediately</code></pre>\n",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Where did the name \"JavaScript\" come from?",
+              "answer": "<p class=\"answer-line\">Originally called <b>LiveScript</b> — renamed to <b>JavaScript</b> purely for marketing, to ride Java's popularity at the time.</p>\n<p>Despite the name, JavaScript has <b>no relation to Java</b>. Completely independent languages with different designs and purposes.</p>\n",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What is ECMAScript",
+              "answer": "<p class=\"answer-line\"><b>ECMAScript</b> is the official <b>specification</b> — the rulebook — that JavaScript follows. JavaScript came first (1995); ECMAScript was created in 1996 to standardize it.</p>\n<p>The name exists because \"JavaScript\" is Oracle's trademark — ECMA International used \"ECMAScript\" to avoid legal issues.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n  <thead><tr><th>Term</th><th>Definition</th></tr></thead>\n  <tbody>\n    <tr><td>ECMAScript</td><td>The specification that defines how the language should work</td></tr>\n    <tr><td>JavaScript</td><td>The actual language developers use, which implements that specification</td></tr>\n  </tbody>\n</table></div>\n<br>\n<p>Maintained by <b>TC39</b>. Annual releases since 2015. <b>ES5</b> added strict mode and JSON. <b>ES6/ES2015</b> — also called ES6 — brought classes, arrow functions, modules. <b>ES2025</b> is the current specification.</p>\n",
+              "long": false,
+              "tag": ""
+            }
+          ]
+        },
+        {
+          "id": "engine-execution",
+          "name": "Engine execution",
+          "cards": [
+            {
+              "question": "How does a JavaScript engine work?",
+              "answer": "<p class=\"answer-line\">A JavaScript engine reads your code in three steps:</p>\n<ol>\n  <li><b>Parse</b> — reads the script and checks the syntax</li>\n  <li><b>Compile</b> — converts it to machine code</li>\n  <li><b>Execute</b> — runs the machine code, fast</li>\n</ol>\n<p>The engine doesn't stop there — it watches the code as it runs, analyzes the data flowing through it, and keeps optimizing the machine code on the fly.</p>\n<p>Well-known engines: <b>V8</b> (Chrome, Node.js), <b>SpiderMonkey</b> (Firefox).</p>\n<p class=\"note\">This is a simplified view — engines are far more complex under the hood.</p>\n",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What is JIT compilation?",
+              "answer": "<p class=\"answer-line\"><b>JIT (Just-In-Time) compilation is a technique that translates computer code directly into native machine code while the program is executing (at runtime).</p><br>\n<p>Traditional compilers compile everything upfront. Interpreters run line by line without compiling. JIT is the middle ground — it compiles at runtime, right when the code is needed.</p><br>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n  <thead><tr><th>Approach</th><th>How it works</th></tr></thead>\n  <tbody>\n    <tr><td>Compiler</td><td>Compiles everything upfront, then runs</td></tr>\n    <tr><td>Interpreter</td><td>Runs line by line, no compilation</td></tr>\n    <tr><td><b>JIT</b></td><td>Compiles at runtime, right when needed</td></tr>\n  </tbody>\n</table></div>\n<br>\n<p>This is why JavaScript is fast despite being a scripting language. The engine also watches which parts run most often and optimizes those hotspots further.</p>\n",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Is JavaScript interpreted or compiled?",
+              "answer": "<p class=\"answer-line\">Neither purely. JavaScript is often called <b>interpreted</b> because there's no separate compile step — you write it and run it directly, unlike C or Java.</p>\n<p>But modern engines use <b>JIT</b> — they compile the code under the hood at runtime. From the developer's side it feels interpreted; under the hood it's being compiled.</p>\n<p>The correct answer: JavaScript is <b>JIT-compiled at runtime</b>.</p>\n",
+              "long": false,
+              "tag": ""
+            }
+          ]
+        },
+        {
+          "id": "browser-capabilities",
+          "name": "Browser capabilities",
+          "cards": [
+            {
+              "question": "What can JavaScript do in the browser?",
+              "answer": "<p class=\"answer-line\"></p><p class=\"answer-line\">JavaScript in the browser can:</p>\n<ul>\n  <li><b>Manipulate the page</b> — add, change, or remove HTML and CSS</li>\n  <li><b>React to user actions</b> — clicks, key presses, mouse movements</li>\n  <li><b>Communicate with servers</b> — send and receive data without reloading the page (AJAX)</li>\n  <li><b>Manage data</b> — read and write cookies, use localStorage</li>\n  <li><b>Access devices</b> — camera, microphone (with user permission)</li>\n</ul>\n",
+              "long": false,
+              "tag": ""
+            }
+          ]
+        },
+        {
+          "id": "security-limitations",
+          "name": "Security limitations",
+          "cards": [
+            {
+              "question": "What can't JavaScript do in the browser?",
+              "answer": "<p class=\"answer-line\">JavaScript runs in a sandbox — it can't touch the OS or other sites freely.</p>\n<ul>\n  <li><b>File system</b> — can't read or write files on your computer. Only gets file access if the user explicitly selects one.</li>\n  <li><b>Other tabs</b> — a page can't read data from a tab on a different domain. <code>evil.com</code> can't peek at your open <code>gmail.com</code> tab.</li>\n  <li><b>Cross-domain requests</b> — a script can freely talk to its own server. Talking to a different domain requires that server to explicitly allow it (CORS headers).</li>\n</ul>\n<p class=\"note\">These restrictions exist only in the browser. Node.js has none of them.</p>\n",
+              "long": false,
+              "tag": ""
+            }
+          ]
+        },
+        {
+          "id": "unique-traits",
+          "name": "Unique traits",
+          "cards": [
+            {
+              "question": "What makes JavaScript unique?",
+              "answer": "<p class=\"answer-line\">No other browser technology combines all three:</p>\n<ul>\n  <li><b>Native HTML/CSS integration</b> — built into the browser alongside them, no setup needed.</li>\n  <li><b>Simple things stay simple</b> — basic tasks don't need boilerplate.</li>\n  <li><b>Runs everywhere by default</b> — supported in all major browsers, enabled out of the box.</li>\n</ul>\n<p class=\"answer-line\"></p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
+        },
+        {
+          "id": "transpiled-languages",
+          "name": "Transpiled languages",
+          "cards": [
+            {
+              "question": "What are transpiled languages?",
+              "answer": "<p class=\"answer-line\">Some languages compile down to JavaScript so they can run in the browser. You write in another language, a tool converts it to JS automatically.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n  <thead><tr><th>Language</th><th>What it adds</th></tr></thead>\n  <tbody>\n    <tr><td><b>TypeScript</b></td><td>Strict types on top of JS (Microsoft)</td></tr>\n    <tr><td><b>CoffeeScript</b></td><td>Cleaner, shorter syntax — popular with Ruby devs</td></tr>\n    <tr><td><b>Flow</b></td><td>Type checking only (Facebook)</td></tr>\n    <tr><td><b>Dart</b></td><td>Standalone language by Google, can target the browser</td></tr>\n    <tr><td><b>Kotlin</b></td><td>Modern language, can compile to JS</td></tr>\n    <tr><td><b>Babel</b></td><td>Transpiles modern JS to older JS for browser compatibility</td></tr>\n  </tbody>\n</table></div>\n<br>\n<p class=\"note\">Whatever language you use, the browser still runs JavaScript underneath — that's why understanding JS itself matters.</p>\n",
               "long": false,
               "tag": ""
             }
