@@ -39,9 +39,10 @@
     return order.map(id => { const t = getTech(id); return t ? Object.assign({ id }, t) : null; }).filter(t => t && t.name);
   }
   function getTech(id) {
+    const base = (window.RECALL_CONTENT || {})[id];
     const ov = localStorage.getItem('recall-content:' + id);
-    if (ov) { try { return JSON.parse(ov); } catch (e) {} }
-    return (window.RECALL_CONTENT || {})[id];
+    if (ov) { try { const o = JSON.parse(ov); if (o.updated == null && base) o.updated = base.updated; return o; } catch (e) {} }
+    return base;
   }
   function saveTech(id, obj) { localStorage.setItem('recall-content:' + id, JSON.stringify(obj)); }
   function resetTech(id) { localStorage.removeItem('recall-content:' + id); }
@@ -220,6 +221,7 @@
       </aside>
       <main class="main"><div class="main-inner">
         <div class="qa-head qa-head--slim">
+          ${TECH.updated ? `<span class="qa-updated" title="When this subject's content was last saved">Updated ${TECH.updated}</span>` : ''}
           <button class="reveal-btn" id="revealAll" type="button">${EYE}<span class="reveal-label">Reveal all</span></button>
         </div>
         <div class="no-results">No questions match that search.</div>

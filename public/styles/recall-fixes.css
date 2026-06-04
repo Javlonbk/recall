@@ -53,3 +53,7 @@ body.rcefx-dragging, body.rcefx-dragging * { cursor: grabbing !important; }
 .rcefx-xbtn.rcefx-xprimary { background: var(--accent, #b8741a); color: #fff; border-color: transparent; }
 .rcefx-xbtn.rcefx-xprimary:hover { color: #fff; filter: brightness(1.06); }
 .rcefx-xbtn:disabled { opacity: .6; cursor: default; }
+
+/* Subject "Updated <date>" stamp in the Q&A head (recall.js renderQA). Pushes to
+   the left so the Reveal-all button stays right in the slim flex row. */
+.qa-updated { margin-right: auto; font: 500 12.5px/1 var(--sans, system-ui); color: var(--ink-3, #999); letter-spacing: .01em; }

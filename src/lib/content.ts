@@ -12,6 +12,7 @@ type RawTech = {
   name: string;
   blurb?: string;
   order?: number;
+  updated?: string;
   topics?: RawTopic[];
   book?: RawBook[];
 };
@@ -41,6 +42,7 @@ export function getRecallData() {
     content[id] = {
       name: t.name,
       blurb: t.blurb ?? '',
+      ...(t.updated ? { updated: t.updated } : {}),
       topics: (t.topics ?? []).map((tp) => ({
         id: tp.id,
         name: tp.name,

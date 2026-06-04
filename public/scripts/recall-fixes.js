@@ -169,11 +169,15 @@
      recall.js works with content in render shape (q/a, no order); the source
      files are storage shape (question/answer + order). Convert before writing
      so the output is a drop-in replacement for src/content/tech/<id>.json. */
+  function todayISO() {
+    var d = new Date(); function p(n) { return (n < 10 ? '0' : '') + n; }
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
   function toStorage(id) {
     var d = techData(id) || {};
     var order = (window.RECALL_ORDER || []).indexOf(id); if (order < 0) order = 0;
     return {
-      name: d.name, blurb: d.blurb || '', order: order,
+      name: d.name, blurb: d.blurb || '', order: order, updated: todayISO(),
       topics: (d.topics || []).map(function (t) {
         return { id: t.id, name: t.name, subtopics: (t.subtopics || []).map(function (s) {
           return { id: s.id, name: s.name, cards: (s.cards || []).map(function (c) {
