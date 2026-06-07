@@ -105,6 +105,967 @@
           ]
         }
       ]
+    },
+    {
+      "id": "fundamentals",
+      "name": "Fundamentals",
+      "subtopics": [
+        {
+          "id": "variables",
+          "name": "Variables",
+          "cards": []
+        },
+        {
+          "id": "statements-expressions",
+          "name": "Statements vs expressions",
+          "cards": []
+        },
+        {
+          "id": "strict-mode",
+          "name": "Strict mode",
+          "cards": []
+        },
+        {
+          "id": "operators",
+          "name": "Operators & precedence",
+          "cards": []
+        },
+        {
+          "id": "modern-operators",
+          "name": "Modern operators",
+          "cards": []
+        },
+        {
+          "id": "control-flow",
+          "name": "Control flow",
+          "cards": []
+        },
+        {
+          "id": "asi",
+          "name": "ASI & semicolons",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "types",
+      "name": "Types",
+      "subtopics": [
+        {
+          "id": "primitives-vs-objects",
+          "name": "Primitives vs objects",
+          "cards": []
+        },
+        {
+          "id": "typeof",
+          "name": "typeof",
+          "cards": []
+        },
+        {
+          "id": "undefined-null-tdz",
+          "name": "undefined / null / TDZ",
+          "cards": []
+        },
+        {
+          "id": "nan",
+          "name": "NaN",
+          "cards": []
+        },
+        {
+          "id": "negative-zero",
+          "name": "Negative zero",
+          "cards": []
+        },
+        {
+          "id": "wrapper-objects",
+          "name": "Wrapper objects",
+          "cards": []
+        },
+        {
+          "id": "bigint-symbol",
+          "name": "BigInt & Symbol",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "coercion",
+      "name": "Coercion",
+      "subtopics": [
+        {
+          "id": "abstract-operations",
+          "name": "Abstract operations",
+          "cards": []
+        },
+        {
+          "id": "boxing",
+          "name": "Boxing",
+          "cards": []
+        },
+        {
+          "id": "explicit-vs-implicit",
+          "name": "Explicit vs implicit",
+          "cards": []
+        },
+        {
+          "id": "corner-cases",
+          "name": "Corner cases",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "equality",
+      "name": "Equality",
+      "subtopics": [
+        {
+          "id": "strict-equality",
+          "name": "Strict equality",
+          "cards": []
+        },
+        {
+          "id": "abstract-equality",
+          "name": "Abstract equality",
+          "cards": []
+        },
+        {
+          "id": "object-is-samevaluezero",
+          "name": "Object.is & SameValueZero",
+          "cards": []
+        },
+        {
+          "id": "eq-null-idiom",
+          "name": "The == null idiom",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "scope",
+      "name": "Scope",
+      "subtopics": [
+        {
+          "id": "compile-then-execute",
+          "name": "Compile then execute",
+          "cards": []
+        },
+        {
+          "id": "lexical-scope",
+          "name": "Lexical scope",
+          "cards": []
+        },
+        {
+          "id": "scope-chain",
+          "name": "The scope chain",
+          "cards": []
+        },
+        {
+          "id": "lhs-vs-rhs",
+          "name": "LHS vs RHS",
+          "cards": []
+        },
+        {
+          "id": "hoisting-tdz",
+          "name": "Hoisting & TDZ",
+          "cards": []
+        },
+        {
+          "id": "shadowing",
+          "name": "Shadowing",
+          "cards": []
+        },
+        {
+          "id": "execution-context",
+          "name": "Execution context",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "function-expressions",
+      "name": "Function Expressions & Scope",
+      "subtopics": [
+        {
+          "id": "declarations-vs-expressions",
+          "name": "Declarations vs expressions",
+          "cards": []
+        },
+        {
+          "id": "named-function-expressions",
+          "name": "Named function expressions",
+          "cards": []
+        },
+        {
+          "id": "arrow-functions",
+          "name": "Arrow functions",
+          "cards": []
+        },
+        {
+          "id": "iife",
+          "name": "IIFE",
+          "cards": []
+        },
+        {
+          "id": "block-scope",
+          "name": "Block scope",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "global-scope-var",
+      "name": "Global Scope & var",
+      "subtopics": [
+        {
+          "id": "globalthis",
+          "name": "globalThis",
+          "cards": []
+        },
+        {
+          "id": "the-old-var",
+          "name": "The old var",
+          "cards": []
+        },
+        {
+          "id": "global-object",
+          "name": "The global object",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "closure",
+      "name": "Closure",
+      "subtopics": [
+        {
+          "id": "what-closure-is",
+          "name": "What closure is",
+          "cards": []
+        },
+        {
+          "id": "closes-over-variables",
+          "name": "Closes over variables, not values",
+          "cards": []
+        },
+        {
+          "id": "lifecycle-gc",
+          "name": "Lifecycle & GC",
+          "cards": []
+        },
+        {
+          "id": "practical-uses",
+          "name": "Practical uses",
+          "cards": []
+        },
+        {
+          "id": "var-in-loop",
+          "name": "var-in-loop pitfall",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "modules",
+      "name": "Modules",
+      "subtopics": [
+        {
+          "id": "module-pattern",
+          "name": "Module pattern",
+          "cards": []
+        },
+        {
+          "id": "commonjs",
+          "name": "CommonJS",
+          "cards": []
+        },
+        {
+          "id": "es-modules",
+          "name": "ES Modules",
+          "cards": []
+        },
+        {
+          "id": "dynamic-import",
+          "name": "Dynamic import",
+          "cards": []
+        },
+        {
+          "id": "module-metadata",
+          "name": "Module metadata",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "objects-basics",
+      "name": "Objects Basics",
+      "subtopics": [
+        {
+          "id": "object-literals",
+          "name": "Object literals",
+          "cards": []
+        },
+        {
+          "id": "computed-shorthand",
+          "name": "Computed & shorthand properties",
+          "cards": []
+        },
+        {
+          "id": "references-vs-copying",
+          "name": "References vs copying",
+          "cards": []
+        },
+        {
+          "id": "shallow-vs-deep-copy",
+          "name": "Copying & structuredClone",
+          "cards": []
+        },
+        {
+          "id": "property-descriptors",
+          "name": "Property descriptors",
+          "cards": []
+        },
+        {
+          "id": "enumerability-ownership",
+          "name": "Enumerability & ownership",
+          "cards": []
+        },
+        {
+          "id": "getters-setters",
+          "name": "Getters & setters",
+          "cards": []
+        },
+        {
+          "id": "extensibility",
+          "name": "Extensibility control",
+          "cards": []
+        },
+        {
+          "id": "optional-chaining",
+          "name": "Optional chaining",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "this-binding",
+      "name": "this & Binding",
+      "subtopics": [
+        {
+          "id": "four-binding-rules",
+          "name": "The four binding rules",
+          "cards": []
+        },
+        {
+          "id": "call-apply-bind",
+          "name": "call / apply / bind",
+          "cards": []
+        },
+        {
+          "id": "arrow-this",
+          "name": "Arrow this",
+          "cards": []
+        },
+        {
+          "id": "losing-this",
+          "name": "Losing this",
+          "cards": []
+        },
+        {
+          "id": "reference-type",
+          "name": "The Reference Type",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "prototypes",
+      "name": "Prototypes",
+      "subtopics": [
+        {
+          "id": "prototypal-inheritance",
+          "name": "Prototypal inheritance",
+          "cards": []
+        },
+        {
+          "id": "proto-vs-prototype",
+          "name": "__proto__ vs prototype",
+          "cards": []
+        },
+        {
+          "id": "prototype-chain",
+          "name": "The prototype chain",
+          "cards": []
+        },
+        {
+          "id": "native-prototypes",
+          "name": "Native prototypes",
+          "cards": []
+        },
+        {
+          "id": "object-create",
+          "name": "Object.create & prototype API",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "classes",
+      "name": "Classes",
+      "subtopics": [
+        {
+          "id": "class-syntax",
+          "name": "Class syntax",
+          "cards": []
+        },
+        {
+          "id": "inheritance-super",
+          "name": "Inheritance & super",
+          "cards": []
+        },
+        {
+          "id": "static-members",
+          "name": "Static members",
+          "cards": []
+        },
+        {
+          "id": "private-fields",
+          "name": "Private fields",
+          "cards": []
+        },
+        {
+          "id": "private-methods-static-blocks",
+          "name": "Private methods & static blocks",
+          "cards": []
+        },
+        {
+          "id": "instanceof",
+          "name": "instanceof",
+          "cards": []
+        },
+        {
+          "id": "mixins",
+          "name": "Mixins",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "numbers-math",
+      "name": "Numbers & Math",
+      "subtopics": [
+        {
+          "id": "float-representation",
+          "name": "Float representation",
+          "cards": []
+        },
+        {
+          "id": "precision-traps",
+          "name": "Precision & safe integers",
+          "cards": []
+        },
+        {
+          "id": "number-methods",
+          "name": "Number methods",
+          "cards": []
+        },
+        {
+          "id": "legacy-globals",
+          "name": "Number gotchas",
+          "cards": []
+        },
+        {
+          "id": "bigint",
+          "name": "BigInt",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "strings",
+      "name": "Strings",
+      "subtopics": [
+        {
+          "id": "string-methods",
+          "name": "String methods",
+          "cards": []
+        },
+        {
+          "id": "template-literals",
+          "name": "Template literals",
+          "cards": []
+        },
+        {
+          "id": "tagged-templates",
+          "name": "Tagged templates",
+          "cards": []
+        },
+        {
+          "id": "unicode-internals",
+          "name": "Unicode internals",
+          "cards": []
+        },
+        {
+          "id": "modern-string-methods",
+          "name": "Modern methods",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "regular-expressions",
+      "name": "Regular Expressions",
+      "subtopics": [
+        {
+          "id": "regex-basics",
+          "name": "Literals & flags",
+          "cards": []
+        },
+        {
+          "id": "character-classes",
+          "name": "Character classes",
+          "cards": []
+        },
+        {
+          "id": "anchors-assertions",
+          "name": "Anchors & lookarounds",
+          "cards": []
+        },
+        {
+          "id": "groups-backreferences",
+          "name": "Groups & backreferences",
+          "cards": []
+        },
+        {
+          "id": "quantifiers",
+          "name": "Quantifiers",
+          "cards": []
+        },
+        {
+          "id": "regex-methods",
+          "name": "Methods & sticky flag",
+          "cards": []
+        },
+        {
+          "id": "catastrophic-backtracking",
+          "name": "Catastrophic backtracking",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "arrays",
+      "name": "Arrays",
+      "subtopics": [
+        {
+          "id": "array-basics",
+          "name": "Array basics",
+          "cards": []
+        },
+        {
+          "id": "mutating-vs-non-mutating",
+          "name": "Mutating vs non-mutating",
+          "cards": []
+        },
+        {
+          "id": "iteration-methods",
+          "name": "Iteration methods",
+          "cards": []
+        },
+        {
+          "id": "immutable-methods",
+          "name": "Immutable methods",
+          "cards": []
+        },
+        {
+          "id": "sparse-arrays",
+          "name": "Sparse & array-likes",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "map-set",
+      "name": "Map & Set",
+      "subtopics": [
+        {
+          "id": "map",
+          "name": "Map",
+          "cards": []
+        },
+        {
+          "id": "set",
+          "name": "Set",
+          "cards": []
+        },
+        {
+          "id": "weakmap-weakset",
+          "name": "WeakMap & WeakSet",
+          "cards": []
+        },
+        {
+          "id": "set-methods",
+          "name": "Set methods",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "binary-data",
+      "name": "Binary Data & Typed Arrays",
+      "subtopics": [
+        {
+          "id": "arraybuffer",
+          "name": "ArrayBuffer",
+          "cards": []
+        },
+        {
+          "id": "typed-arrays",
+          "name": "TypedArrays",
+          "cards": []
+        },
+        {
+          "id": "dataview",
+          "name": "DataView",
+          "cards": []
+        },
+        {
+          "id": "blob-files",
+          "name": "Blob & files",
+          "cards": []
+        },
+        {
+          "id": "shared-memory",
+          "name": "SharedArrayBuffer & Atomics",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "object-utilities",
+      "name": "Object Utilities",
+      "subtopics": [
+        {
+          "id": "keys-values-entries",
+          "name": "keys / values / entries",
+          "cards": []
+        },
+        {
+          "id": "destructuring",
+          "name": "Destructuring",
+          "cards": []
+        },
+        {
+          "id": "spread-rest",
+          "name": "Spread & rest",
+          "cards": []
+        },
+        {
+          "id": "object-plumbing",
+          "name": "Object plumbing",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "iterables",
+      "name": "Iterables & Iterators",
+      "subtopics": [
+        {
+          "id": "iterable-protocol",
+          "name": "The iterable protocol",
+          "cards": []
+        },
+        {
+          "id": "symbol-iterator",
+          "name": "Symbol.iterator",
+          "cards": []
+        },
+        {
+          "id": "iterator-helpers",
+          "name": "Iterator helpers",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "date-json",
+      "name": "Date & JSON",
+      "subtopics": [
+        {
+          "id": "date-time",
+          "name": "Date & time",
+          "cards": []
+        },
+        {
+          "id": "json-methods",
+          "name": "JSON methods",
+          "cards": []
+        },
+        {
+          "id": "temporal",
+          "name": "Temporal",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "intl",
+      "name": "Internationalization",
+      "subtopics": [
+        {
+          "id": "intl-numberformat",
+          "name": "NumberFormat",
+          "cards": []
+        },
+        {
+          "id": "intl-datetimeformat",
+          "name": "DateTimeFormat",
+          "cards": []
+        },
+        {
+          "id": "intl-collator",
+          "name": "Collator",
+          "cards": []
+        },
+        {
+          "id": "intl-segmenter-plural",
+          "name": "Segmenter & PluralRules",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "advanced-functions",
+      "name": "Advanced Functions",
+      "subtopics": [
+        {
+          "id": "recursion-stack",
+          "name": "Recursion & stack",
+          "cards": []
+        },
+        {
+          "id": "rest-spread-params",
+          "name": "Rest & spread params",
+          "cards": []
+        },
+        {
+          "id": "default-params",
+          "name": "Default params",
+          "cards": []
+        },
+        {
+          "id": "arguments-new-target",
+          "name": "arguments & new.target",
+          "cards": []
+        },
+        {
+          "id": "currying",
+          "name": "Currying",
+          "cards": []
+        },
+        {
+          "id": "functional-programming",
+          "name": "Functional programming",
+          "cards": []
+        },
+        {
+          "id": "decorators-forwarding",
+          "name": "Decorators & forwarding",
+          "cards": []
+        },
+        {
+          "id": "perf-utilities",
+          "name": "Performance utilities",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "event-loop",
+      "name": "Event Loop",
+      "subtopics": [
+        {
+          "id": "call-stack",
+          "name": "Call stack",
+          "cards": []
+        },
+        {
+          "id": "task-microtask-queue",
+          "name": "Task vs microtask queue",
+          "cards": []
+        },
+        {
+          "id": "scheduling",
+          "name": "setTimeout & setInterval",
+          "cards": []
+        },
+        {
+          "id": "microtask-ordering",
+          "name": "Microtask ordering",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "promises",
+      "name": "Promises",
+      "subtopics": [
+        {
+          "id": "promise-states",
+          "name": "Promise states",
+          "cards": []
+        },
+        {
+          "id": "chaining",
+          "name": "Chaining",
+          "cards": []
+        },
+        {
+          "id": "promise-error-handling",
+          "name": "Error handling",
+          "cards": []
+        },
+        {
+          "id": "promise-api",
+          "name": "Promise API",
+          "cards": []
+        },
+        {
+          "id": "promisification",
+          "name": "Promisification",
+          "cards": []
+        },
+        {
+          "id": "implement-combinators",
+          "name": "Implementing combinators",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "async-await",
+      "name": "async / await",
+      "subtopics": [
+        {
+          "id": "async-functions",
+          "name": "async functions",
+          "cards": []
+        },
+        {
+          "id": "await",
+          "name": "await",
+          "cards": []
+        },
+        {
+          "id": "async-error-handling",
+          "name": "Error handling",
+          "cards": []
+        },
+        {
+          "id": "concurrency-control",
+          "name": "Concurrency control",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "generators",
+      "name": "Generators & Async Iteration",
+      "subtopics": [
+        {
+          "id": "generators",
+          "name": "Generators",
+          "cards": []
+        },
+        {
+          "id": "two-way-communication",
+          "name": "Two-way communication",
+          "cards": []
+        },
+        {
+          "id": "async-iteration",
+          "name": "Async iteration",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "error-handling",
+      "name": "Error Handling",
+      "subtopics": [
+        {
+          "id": "try-catch-finally",
+          "name": "try / catch / finally",
+          "cards": []
+        },
+        {
+          "id": "custom-errors",
+          "name": "Custom errors",
+          "cards": []
+        },
+        {
+          "id": "extending-error",
+          "name": "Extending Error",
+          "cards": []
+        },
+        {
+          "id": "error-taxonomy",
+          "name": "Error taxonomy",
+          "cards": []
+        },
+        {
+          "id": "error-cause",
+          "name": "error.cause",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "metaprogramming",
+      "name": "Metaprogramming",
+      "subtopics": [
+        {
+          "id": "proxy",
+          "name": "Proxy",
+          "cards": []
+        },
+        {
+          "id": "reflect",
+          "name": "Reflect",
+          "cards": []
+        },
+        {
+          "id": "well-known-symbols",
+          "name": "Well-known symbols",
+          "cards": []
+        },
+        {
+          "id": "eval",
+          "name": "eval",
+          "cards": []
+        }
+      ]
+    },
+    {
+      "id": "memory-gc",
+      "name": "Memory & GC",
+      "subtopics": [
+        {
+          "id": "garbage-collection",
+          "name": "Garbage collection",
+          "cards": []
+        },
+        {
+          "id": "memory-leaks",
+          "name": "Memory leaks",
+          "cards": []
+        },
+        {
+          "id": "weakref-finalization",
+          "name": "WeakRef & FinalizationRegistry",
+          "cards": []
+        }
+      ]
     }
   ],
   "book": [
