@@ -2,7 +2,7 @@
   "name": "JavaScript",
   "blurb": "The language of the web — types, scope, closures, and the event loop.",
   "order": 0,
-  "updated": "2026-06-05",
+  "updated": "2026-06-08",
   "topics": [
     {
       "id": "sample",
@@ -113,37 +113,224 @@
         {
           "id": "variables",
           "name": "Variables",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is a variable?",
+              "answer": "<p class=\"answer-line\">A variable is a named storage for data — a place to keep a value so you can refer to it later by name.</p>\n<pre><code>let message = 'Hello';\nmessage = 'World';     // the stored value can be replaced\nconsole.log(message);  // World</code></pre>\n<p>You can picture it as a box with a name sticker on it: the box holds the value, and the name lets you find it again.</p>\n",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What are the three ways to declare a variable in JavaScript?",
+              "answer": "<p class=\"answer-line\">A variable is a named storage for a value. You create one with <code>const</code>, <code>let</code>, or the older <code>var</code>.</p>\n<p>The keyword sets how the variable behaves: where it is visible, whether its value can change, and how it acts before its declaration runs.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n  <thead><tr><th></th><th>Visible in</th><th>Can change?</th><th>Redeclare?</th></tr></thead>\n  <tbody>\n    <tr><td class=\"mono\">const</td><td>the block</td><td>no</td><td>no</td></tr>\n    <tr><td class=\"mono\">let</td><td>the block</td><td>yes</td><td>no</td></tr>\n    <tr><td class=\"mono\">var</td><td>the whole function</td><td>yes</td><td>yes</td></tr>\n  </tbody>\n</table></div>\n<p>Today <code>let</code> and <code>const</code> are used for everything; <code>var</code> is the older form, kept for backward compatibility.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What's the difference between block scope and function scope?",
+              "answer": "<p class=\"answer-line\">Scope is the region of code where a variable is visible. <code>let</code> and <code>const</code> are block-scoped — they exist only inside the <code>{ }</code> block where they are declared. <code>var</code> is function-scoped — it ignores blocks and exists throughout the whole function.</p>\n<pre><code>function f() {\n  if (true) {\n    var a = 1;\n    let b = 2;\n  }\n  console.log(a); // 1 — var is visible here\n  console.log(b); // ReferenceError — b only existed in the block\n}</code></pre>\n<p>Because a <code>var</code> is not limited to its block, it stays visible after the block ends — a common source of bugs.</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "What does each keyword allow for reassignment, redeclaration, and initialization?",
+              "answer": "<p class=\"answer-line\"><code>let</code> can be reassigned and may be declared without a value. <code>const</code> must be given a value when declared and cannot be reassigned afterward. Neither can be declared twice in the same scope; <code>var</code> can.</p>\n<pre><code>const a;     // SyntaxError — const needs a value\nlet b;       // ok — b is undefined\n\nlet x = 1;\nx = 2;       // ok — reassigned\nlet x = 3;   // SyntaxError — already declared\n\nvar y = 1;\nvar y = 2;   // ok — var allows redeclaration</code></pre>\n<p>Redeclaring the same name is usually a mistake, so <code>let</code> and <code>const</code> report it as an error.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Does const make the value immutable?",
+              "answer": "<p class=\"answer-line\"><code>const</code> stops the variable from being reassigned — it does not make the value itself read-only. If a <code>const</code> holds an object or array, its contents can still be changed.</p>\n<p>The variable is a sticker on a box: <code>const</code> stops you moving the sticker to another box, but the box can still be filled and emptied.</p>\n<pre><code>const arr = [1, 2];\narr.push(3);   // ok — changing the contents\narr = [];      // TypeError — reassigning the variable</code></pre>\n<p>To freeze the contents as well, use <code>Object.freeze</code>.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "What are the rules and conventions for naming variables?",
+              "answer": "<p class=\"answer-line\">A name may contain only letters, digits, and the symbols <code>$</code> and <code>_</code>, and the first character cannot be a digit. Names are case-sensitive, and reserved words like <code>let</code> or <code>class</code> cannot be used.</p>\n<pre><code>let userName;   // ok\nlet $el, _x;    // ok\nlet 1st;        // SyntaxError — starts with a digit\nlet name, Name; // two different variables</code></pre>\n<p>By convention, use <code>camelCase</code> for variables and <code>UPPER_CASE</code> for hard-coded constants.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Which declaration should you reach for by default, and why?",
+              "answer": "<p class=\"answer-line\">Use <code>const</code> by default, and <code>let</code> only for values that need to change. Avoid <code>var</code>.</p>\n<p>Defaulting to <code>const</code> makes it clear which values are meant to stay fixed, and both <code>let</code> and <code>const</code> avoid the function-scope and hoisting quirks of <code>var</code>.</p>",
+              "long": false,
+              "tag": "interview"
+            }
+          ]
         },
         {
           "id": "statements-expressions",
           "name": "Statements vs expressions",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is the difference between a statement and an expression?",
+              "answer": "<p class=\"answer-line\">An <b>expression</b> is any code that produces a value. A <b>statement</b> is an instruction that performs an action. A program is a list of statements.</p>\n<pre><code>2 + 2          // expression → produces 4\nlet x = 5;     // statement → performs a declaration</code></pre>\n<p>Expressions appear inside statements: in <code>let x = 2 + 2;</code> the right side is an expression, the whole line is a statement.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What is an expression statement?",
+              "answer": "<p class=\"answer-line\">When an expression stands on its own as a statement, it is an expression statement: its value is computed and then discarded, so it is only useful for its side effect.</p>\n<pre><code>greet();   // function call — kept for its side effect\nx = 3;     // assignment expression used as a statement\nx + 1;     // valid, but pointless — the value is thrown away</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "How do you produce a value where a statement like if won't work?",
+              "answer": "<p class=\"answer-line\">Statements such as <code>if</code> and <code>for</code> do not produce values, so they cannot be used where a value is expected. Use an expression form instead: the ternary <code>? :</code>, or <code>&&</code> / <code>||</code>.</p>\n<pre><code>const max = a &gt; b ? a : b;   // ok — ternary is an expression\nconst max = if (a &gt; b) a;    // SyntaxError — if is a statement</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Why can the same characters mean different things depending on position?",
+              "answer": "<p class=\"answer-line\">Position decides meaning. At the start of a statement <code>{</code> begins a block; in an expression position the same <code>{</code> begins an object literal.</p>\n<pre><code>{}              // an empty block\nconst o = {};   // an object literal</code></pre>\n<p>This is why an object literal returned from an arrow function must be wrapped: <code>() =&gt; ({})</code>.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "strict-mode",
           "name": "Strict mode",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is strict mode and how do you enable it?",
+              "answer": "<p class=\"answer-line\">Strict mode is a restricted variant of JavaScript that makes the engine stricter about mistakes. You enable it with the directive <code>'use strict'</code> at the top of a script or a function body.</p>\n<pre><code>'use strict';\n// ... the rest of the file runs in strict mode</code></pre>\n<p>Modern code rarely writes it: ES modules and class bodies are in strict mode automatically.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What does strict mode change?",
+              "answer": "<p class=\"answer-line\">It turns silent mistakes into thrown errors and removes some unsafe behavior.</p>\n<ul>\n  <li>Assigning to an undeclared variable throws, instead of silently creating a global.</li>\n  <li>Writing to a read-only property throws instead of failing quietly.</li>\n  <li>Duplicate function parameter names become a syntax error.</li>\n  <li><code>this</code> is <code>undefined</code> in a plain function call, not the global object.</li>\n  <li>The old <code>with</code> statement is forbidden.</li>\n</ul>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Why does strict mode exist, and should you use it?",
+              "answer": "<p class=\"answer-line\">It surfaces bugs early by refusing to ignore questionable code, and it disables legacy behavior that made code harder to optimize and reason about.</p>\n<p>In practice you get it for free — modules and classes are always strict — so you only add <code>'use strict'</code> in old-style, non-module scripts.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "operators",
           "name": "Operators & precedence",
-          "cards": []
+          "cards": [
+            {
+              "question": "What are operands, and what are unary, binary, and ternary operators?",
+              "answer": "<p class=\"answer-line\">An operator acts on values called <b>operands</b>. Operators are grouped by how many operands they take: <b>unary</b> (one), <b>binary</b> (two), and the single <b>ternary</b> (three).</p>\n<pre><code>-x          // unary minus (one operand)\na + b       // binary plus (two operands)\na ? b : c   // the ternary operator (three operands)</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What do the arithmetic operators do, and how does + behave with strings?",
+              "answer": "<p class=\"answer-line\">The arithmetic operators are <code>+ - * /</code> plus <code>%</code> (remainder) and <code>**</code> (exponentiation). They all convert their operands to numbers — except <code>+</code>, which concatenates if either operand is a string.</p>\n<pre><code>2 ** 3     // 8\n10 % 3     // 1\n'1' + 2    // '12'  — string concatenation\n'5' - 2    // 3     — converted to numbers</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What do the logical operators && || ! return, and what is short-circuiting?",
+              "answer": "<p class=\"answer-line\">The logical operators are <code>&&</code> (and), <code>||</code> (or), and <code>!</code> (not). <code>&&</code> and <code>||</code> do not return a boolean — they return one of the operands, and they short-circuit, stopping as soon as the result is known.</p>\n<pre><code>a && b   // a if a is falsy, otherwise b\na || b   // a if a is truthy, otherwise b\n'' || 'default'   // 'default'</code></pre>\n<p>This lets you write <code>user.name || 'Guest'</code> or <code>isReady && render()</code>.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What are operator precedence and associativity?",
+              "answer": "<p class=\"answer-line\">Precedence decides which operator runs first (<code>*</code> before <code>+</code>). Associativity decides the order when operators share precedence: most are left-to-right, but assignment is right-to-left. Parentheses override both.</p>\n<pre><code>2 + 3 * 4    // 14, not 20\na = b = 5    // right-to-left: b = 5, then a = 5</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What's the difference between x++ and ++x?",
+              "answer": "<p class=\"answer-line\"><code>++</code> and <code>--</code> change a variable by one. Prefix (<code>++x</code>) changes it and returns the new value; postfix (<code>x++</code>) returns the old value and then changes it.</p>\n<pre><code>let a = 1;\nlet b = a++;   // b = 1, a = 2\nlet c = ++a;   // c = 3, a = 3</code></pre>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "modern-operators",
           "name": "Modern operators",
-          "cards": []
+          "cards": [
+            {
+              "question": "What does the nullish coalescing operator ?? do?",
+              "answer": "<p class=\"answer-line\"><code>a ?? b</code> returns <code>b</code> only when <code>a</code> is <code>null</code> or <code>undefined</code>. It is like <code>||</code>, but it does not trigger on other falsy values such as <code>0</code> or <code>''</code>.</p>\n<pre><code>0 || 5     // 5  — || treats 0 as missing\n0 ?? 5     // 0  — ?? only fills in null / undefined</code></pre>\n<p>Use <code>??</code> for defaults when <code>0</code>, <code>''</code>, or <code>false</code> are valid values.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "What does optional chaining ?. do?",
+              "answer": "<p class=\"answer-line\"><code>a?.b</code> reads <code>b</code> only if <code>a</code> is not <code>null</code> or <code>undefined</code>; otherwise the whole expression short-circuits to <code>undefined</code> instead of throwing. It works for properties, calls, and dynamic keys.</p>\n<pre><code>user?.address?.city   // undefined if user or address is missing\nuser.getName?.()      // called only if getName exists\narr?.[0]              // index access, guarded</code></pre>\n<p>Use it for genuinely optional parts — not to paper over data that should always be there.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What do the logical assignment operators ??= ||= &&= do?",
+              "answer": "<p class=\"answer-line\">They combine a logical operator with assignment. <code>x ??= y</code> assigns <code>y</code> only if <code>x</code> is null/undefined; <code>||=</code> assigns if <code>x</code> is falsy; <code>&&=</code> assigns if <code>x</code> is truthy.</p>\n<pre><code>let opts = {};\nopts.size ??= 'M';   // set only if not already set</code></pre>\n<p>Each short-circuits, so the right side runs only when the assignment actually happens.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "control-flow",
           "name": "Control flow",
-          "cards": []
+          "cards": [
+            {
+              "question": "What are the conditional statements?",
+              "answer": "<p class=\"answer-line\"><code>if</code> runs a block when its condition is truthy; <code>else</code> and <code>else if</code> handle the alternatives. To choose between two values, the ternary <code>cond ? a : b</code> is the expression form.</p>\n<pre><code>if (score &gt;= 50) pass();\nelse fail();\n\nconst grade = score &gt;= 50 ? 'pass' : 'fail';</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "How does switch work, and what is fall-through?",
+              "answer": "<p class=\"answer-line\"><code>switch</code> compares one value against several <code>case</code> labels using strict equality (<code>===</code>). Execution falls through into the next case unless you <code>break</code>, and <code>default</code> handles no match.</p>\n<pre><code>switch (day) {\n  case 6:\n  case 0:\n    return 'weekend';   // shared via fall-through\n  default:\n    return 'weekday';\n}</code></pre>\n<p>Forgetting <code>break</code> is a classic bug — execution keeps running into the next case.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "What are the loop statements: while, do...while, and for?",
+              "answer": "<p class=\"answer-line\"><code>while</code> repeats while its condition holds, checked before each pass. <code>do...while</code> checks after the body, so it always runs at least once. <code>for</code> packs setup, condition, and step into one header.</p>\n<pre><code>for (let i = 0; i &lt; 3; i++) { /* ... */ }\nwhile (cond) { /* ... */ }\ndo { /* ... */ } while (cond);</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What's the difference between for...of and for...in?",
+              "answer": "<p class=\"answer-line\"><code>for...of</code> loops over the <b>values</b> of an iterable (array, string, Map, Set). <code>for...in</code> loops over the <b>keys</b> of an object — including inherited ones — and is not meant for arrays.</p>\n<pre><code>for (const x of [10, 20]) { } // 10, 20  (values)\nfor (const k in obj) { }      // 'a', 'b' (keys)</code></pre>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "What do break and continue do, and what are labels?",
+              "answer": "<p class=\"answer-line\"><code>break</code> stops a loop entirely; <code>continue</code> skips to the next iteration. A <b>label</b> lets <code>break</code> or <code>continue</code> target an outer loop from inside a nested one.</p>\n<pre><code>outer:\nfor (const row of grid) {\n  for (const cell of row) {\n    if (cell === target) break outer;\n  }\n}</code></pre>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "asi",
           "name": "ASI & semicolons",
-          "cards": []
+          "cards": [
+            {
+              "question": "Are semicolons required in JavaScript?",
+              "answer": "<p class=\"answer-line\">Mostly no. JavaScript has Automatic Semicolon Insertion (ASI): the parser inserts semicolons at most line breaks, so you can usually omit them.</p>\n<pre><code>let a = 1   // works — ASI adds the semicolon\nlet b = 2</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "When does ASI cause bugs?",
+              "answer": "<p class=\"answer-line\">ASI follows fixed rules, and a few cases break code. The worst is <code>return</code> with its value on the next line — ASI ends the statement right after <code>return</code>, so it returns <code>undefined</code>.</p>\n<pre><code>return\n  value;   // returns undefined, not value</code></pre>\n<p>Lines starting with <code>(</code> <code>[</code> or a backtick can also merge with the previous line.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "What's the practical rule for semicolons?",
+              "answer": "<p class=\"answer-line\">Pick one style and stay consistent. If you omit semicolons, guard the risky lines by starting any line that begins with <code>(</code> or <code>[</code> with a semicolon.</p>\n<pre><code>;[1, 2].forEach(fn)   // leading ; stops it merging with the line above</code></pre>\n<p>Most teams let a formatter (Prettier) settle the choice automatically.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         }
       ]
     },
