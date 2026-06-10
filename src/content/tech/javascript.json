@@ -2,7 +2,7 @@
   "name": "JavaScript",
   "blurb": "The language of the web — types, scope, closures, and the event loop.",
   "order": 0,
-  "updated": "2026-06-08",
+  "updated": "2026-06-10",
   "topics": [
     {
       "id": "sample",
@@ -341,37 +341,182 @@
         {
           "id": "primitives-vs-objects",
           "name": "Primitives vs objects",
-          "cards": []
+          "cards": [
+            {
+              "question": "Does JavaScript have types?",
+              "answer": "<p class=\"answer-line\">Yes. JavaScript is <b>dynamically typed</b>, not untyped: the type lives on the <b>value</b>, not the variable.</p>\n<p>In statically typed languages a variable is declared with a type and can only hold values of that type. In JavaScript a variable is just a name — it can hold any type, and you can reassign it to a value of a different type at any moment:</p>\n<pre><code>let x = 42;        // x holds a number\nx = \"hello\";       // the same variable now holds a string\nx = true;          // and now a boolean</code></pre>\n<p>But every <b>value</b> always has exactly one type. <code>42</code> is always a number, <code>\"hello\"</code> is always a string. \"JS is untyped\" is a myth — only the variables are type-free, the values never are.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What types does JavaScript have?",
+              "answer": "<p class=\"answer-line\">Eight: seven <b>primitive</b> types plus <code>object</code>, the only non-primitive.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Type</th><th>Example values</th></tr></thead>\n<tbody>\n<tr><td class=\"mono\">undefined</td><td class=\"mono\">let x;  // x is undefined</td></tr>\n<tr><td class=\"mono\">null</td><td class=\"mono\">let x = null;</td></tr>\n<tr><td class=\"mono\">boolean</td><td class=\"mono\">true, false</td></tr>\n<tr><td class=\"mono\">number</td><td class=\"mono\">42, 3.14, NaN, Infinity</td></tr>\n<tr><td class=\"mono\">string</td><td class=\"mono\">\"hi\", 'hi', `hi`</td></tr>\n<tr><td class=\"mono\">symbol</td><td class=\"mono\">Symbol(\"id\")</td></tr>\n<tr><td class=\"mono\">bigint</td><td class=\"mono\">42n</td></tr>\n<tr><td class=\"mono\"><b>object</b></td><td class=\"mono\">{}, [], function(){}</td></tr>\n</tbody>\n</table></div>\n<p>The <code>object</code> type is broader than it looks: arrays, functions, dates, regexes, Maps and Sets are all objects. Everything that is not one of the seven primitives is an object.</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "What does it mean that primitives are immutable?",
+              "answer": "<p class=\"answer-line\">A primitive value can never be changed. Every operation on a primitive produces a <b>new</b> value; the original stays untouched.</p>\n<pre><code>let s = \"hi\";\nlet upper = s.toUpperCase();\nconsole.log(upper); // \"HI\" — a new string\nconsole.log(s);     // \"hi\" — the original is untouched</code></pre>\n<p>There is no method that modifies a string, number, or boolean in place. When you write <code>s = \"bye\"</code>, you are not changing the string <code>\"hi\"</code>; you are pointing the variable at a different value. Reassigning a variable and mutating a value are two different things.</p>\n<p>Objects are the opposite: they are <b>mutable</b>. You can add, change, and delete their properties after creation.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "How do primitives and objects behave differently on assignment?",
+              "answer": "<p class=\"answer-line\">Primitives are <b>copied by value</b>: each variable gets its own independent copy. Objects are <b>shared by reference</b>: variables point at the same object.</p>\n<pre><code>let a = \"hi\";\nlet b = a;\nb = \"bye\";\nconsole.log(a); // \"hi\"  — primitives are copied by value\n\nlet x = { n: 1 };\nlet y = x;\ny.n = 2;\nconsole.log(x.n); // 2  — objects are shared by reference</code></pre>\n<p>After <code>let b = a</code>, the variables hold two separate strings — changing one cannot affect the other. After <code>let y = x</code>, both variables hold a reference to the <b>same</b> object, so a mutation through <code>y</code> is visible through <code>x</code>.</p>\n<p>The same rule applies to function calls: passing an object to a function passes the reference, so the function can mutate the caller's object.</p>",
+              "long": false,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "typeof",
           "name": "typeof",
-          "cards": []
+          "cards": [
+            {
+              "question": "What does the typeof operator do?",
+              "answer": "<p class=\"answer-line\"><code>typeof</code> returns a string naming the type of a value. It is always a string, even for nonsense input.</p>\n<p>The full result list:</p>\n<pre><code>typeof undefined     // \"undefined\"\ntypeof true          // \"boolean\"\ntypeof 42            // \"number\"\ntypeof 42n           // \"bigint\"\ntypeof \"hi\"          // \"string\"\ntypeof Symbol()      // \"symbol\"\ntypeof {}            // \"object\"\ntypeof []            // \"object\"   (arrays are objects)\ntypeof null          // \"object\"   (a historical bug)\ntypeof function(){}  // \"function\" (functions are callable objects)\ntypeof undeclaredVar // \"undefined\" — does not throw</code></pre>\n<p>One special case: functions get <code>\"function\"</code> even though they are objects — you can attach properties to them like any object. The spec calls them \"callable objects\", and <code>typeof</code> carves them out as a separate case. For exhaustive type checks, treat <code>\"function\"</code> as a subtype of <code>\"object\"</code>.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Why does typeof null return \"object\"?",
+              "answer": "<p class=\"answer-line\">It is a bug from 1995, kept because fixing it would break too much existing code on the web.</p>\n<p><code>null</code> is its own primitive type — it is not an object. But <code>typeof</code> has reported <code>\"object\"</code> for it since the first version of JavaScript, and the result is now frozen into the language.</p>\n<p>So mentally treat <code>null</code> as its own type, and never use <code>typeof</code> to detect it. Check with strict equality instead:</p>\n<pre><code>let value = null;\n\ntypeof value    // \"object\" — the bug\nvalue === null  // true     — the correct check</code></pre>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "Why doesn't typeof throw on undeclared variables?",
+              "answer": "<p class=\"answer-line\">It is intentional: <code>typeof</code> is the one safe way to check whether an identifier exists at all.</p>\n<p>Any other reference to an undeclared variable throws <code>ReferenceError</code>. <code>typeof</code> just returns <code>\"undefined\"</code> instead, which makes it useful for feature-detecting globals that may or may not exist in the current environment:</p>\n<pre><code>if (typeof someGlobal !== \"undefined\") {\n  // safe to use someGlobal\n}\n\nsomeGlobal; // ReferenceError — any other access throws</code></pre>\n<p>One exception: <code>let</code>/<code>const</code> variables in their temporal dead zone — there even <code>typeof</code> throws. So <code>typeof</code> is only safe for identifiers that are truly undeclared.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "How do you tell an array from a plain object?",
+              "answer": "<p class=\"answer-line\">Use <code>Array.isArray()</code>. <code>typeof</code> can't help — arrays are objects, so it returns <code>\"object\"</code> for both.</p>\n<pre><code>typeof []   // \"object\"\ntypeof {}   // \"object\" — typeof can't tell them apart\n\nArray.isArray([])  // true  — use this\nArray.isArray({})  // false</code></pre>\n<p><code>instanceof Array</code> also works, but it checks against the <code>Array</code> constructor of the current realm. An array created in another iframe (or another realm) has a different <code>Array</code>, so the check fails for it:</p>\n<pre><code>[] instanceof Array // true, but breaks across iframes/realms</code></pre>\n<p><code>Array.isArray()</code> has no such limitation — prefer it.</p>",
+              "long": false,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "undefined-null-tdz",
           "name": "undefined / null / TDZ",
-          "cards": []
+          "cards": [
+            {
+              "question": "What's the difference between undefined, undeclared, and uninitialized (TDZ)?",
+              "answer": "<p class=\"answer-line\">Three distinct states all <i>look like</i> <code>undefined</code>: the value <code>undefined</code> (declared but holds no value), <b>undeclared</b> (the identifier doesn't exist at all), and <b>uninitialized</b> (a <code>let</code>/<code>const</code> before its declaration line — the temporal dead zone).</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>State</th><th>Means</th><th>What happens on access</th></tr></thead>\n<tbody>\n<tr><td><code>undefined</code> (the value)</td><td>Variable declared but not assigned, or a function returned nothing</td><td>You get the value <code>undefined</code>; check with <code>value === undefined</code> or <code>typeof value === \"undefined\"</code></td></tr>\n<tr><td>Undeclared</td><td>Identifier never declared in any reachable scope</td><td>Direct access throws <code>ReferenceError</code>; <code>typeof name</code> is safe and returns <code>\"undefined\"</code></td></tr>\n<tr><td>Uninitialized (TDZ)</td><td><code>let</code>/<code>const</code> is declared, but execution hasn't reached its line yet</td><td><b>Any</b> access throws <code>ReferenceError</code> — even <code>typeof</code></td></tr>\n</tbody>\n</table></div>\n<p>All three side by side:</p>\n<pre><code>let x;\nconsole.log(x);        // undefined   — declared, never assigned\nconsole.log(typeof y); // \"undefined\" — y is undeclared; typeof is safe\nconsole.log(typeof z); // ReferenceError: Cannot access 'z' before initialization\nlet z = 1;             // z exists above, but is in its dead zone until here</code></pre>\n<p>The key separator is <code>typeof</code>: it shields you from undeclared identifiers but <b>not</b> from the TDZ. So a <code>ReferenceError</code> from <code>typeof</code> tells you the variable is declared with <code>let</code>/<code>const</code> further down — not that it's missing.</p>",
+              "long": true,
+              "tag": ""
+            },
+            {
+              "question": "What's the difference between null and undefined?",
+              "answer": "<p class=\"answer-line\"><code>undefined</code> is what the <b>engine</b> assigns when something has no value yet; <code>null</code> is what the <b>programmer</b> assigns to say \"intentionally empty\".</p>\n<p>The engine produces <code>undefined</code> everywhere a value is simply missing: an unassigned variable, a function with no <code>return</code>, an argument that wasn't passed. You write <code>null</code> yourself when emptiness is a deliberate state.</p>\n<pre><code>let a;\nfunction f() {}\nconsole.log(a);     // undefined — variable never assigned\nconsole.log(f());   // undefined — function returns nothing\n\nlet user = null;    // \"no user\" — intentional, set by you</code></pre>\n<p>They are loosely equal but not strictly equal:</p>\n<pre><code>null == undefined   // true\nnull === undefined  // false</code></pre>\n<p>A convention worth adopting: <b>never assign <code>undefined</code> manually; reserve <code>null</code> for intentional emptiness.</b> Then the two states stay semantically distinct — <code>undefined</code> means \"the engine never got a value here\", <code>null</code> means \"someone decided this is empty\".</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "When is typeof not safe?",
+              "answer": "<p class=\"answer-line\">In the temporal dead zone: <code>typeof</code> on a <code>let</code>/<code>const</code> variable <b>before its declaration line</b> throws a <code>ReferenceError</code> instead of returning a string.</p>\n<p><code>typeof</code> doesn't throw on undeclared identifiers — but that shield only covers identifiers that were <b>never declared</b>. A <code>let</code>/<code>const</code> variable in its dead zone is declared-but-uninitialized, and there <code>typeof</code> throws like any other access:</p>\n<pre><code>console.log(typeof notDeclared); // \"undefined\" — never declared, safe\n\nconsole.log(typeof userId);      // ReferenceError: Cannot access 'userId' before initialization\nlet userId = 1;</code></pre>\n<p>So <code>typeof</code> is only a safe probe for <b>truly undeclared</b> identifiers. If a <code>let</code> or <code>const</code> declaration for that name exists later in the same scope, even <code>typeof</code> throws before that line.</p>",
+              "long": false,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "nan",
           "name": "NaN",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is NaN?",
+              "answer": "<p class=\"answer-line\"><code>NaN</code> stands for \"Not a Number\" — yet it <b>is</b> a number: <code>typeof NaN === \"number\"</code>. The better mental model: <b>NaN is the special number value that represents an invalid numeric operation</b>.</p>\n<p>Whenever JavaScript is forced to produce a number but the operation makes no numeric sense, the result is <code>NaN</code>:</p>\n<pre><code>typeof NaN     // \"number\"\nNumber(\"foo\")  // NaN — the string has no numeric meaning\n0 / 0          // NaN — mathematically undefined\nparseInt(\"x\")  // NaN — no digits to parse</code></pre>\n<p>So the name describes <b>where it came from</b> (a failed numeric operation), not its type. Think of it as the number type's built-in error value.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Why is NaN === NaN false?",
+              "answer": "<p class=\"answer-line\">The IEEE 754 floating-point standard defines <code>NaN</code> as unequal to everything — <b>including itself</b>. JavaScript numbers follow IEEE 754, so JS inherits that rule.</p>\n<pre><code>NaN === NaN  // false\nNaN == NaN   // false\nNaN &lt; 1      // false — &lt;, &lt;=, &gt;, &gt;=, ==, === with NaN are all false</code></pre>\n<p>The standard chose this on purpose: an invalid numeric result should <b>propagate</b> through calculations (<code>NaN + 1</code> is <code>NaN</code>) and stay <b>detectable</b> at the end. If <code>NaN === NaN</code> were true, a bogus result could quietly compare equal to another bogus result and pass a check it should fail.</p>\n<p><code>NaN</code> is the <b>only</b> value in the language that is not equal to itself. That makes <code>===</code> useless for detecting it — use <code>Number.isNaN(x)</code> instead.</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "How do you detect NaN reliably?",
+              "answer": "<p class=\"answer-line\">Use <code>Number.isNaN(x)</code>: it does no coercion and returns <code>true</code> only when <code>x</code> is actually <code>NaN</code>.</p>\n<p>The trap is the older <b>global</b> <code>isNaN</code>. It first coerces its argument to a number, so any value that coerces to <code>NaN</code> reports <code>true</code> — even though it isn't <code>NaN</code>:</p>\n<pre><code>isNaN(\"foo\")          // true   — WRONG: \"foo\" is coerced to NaN first\nNumber.isNaN(\"foo\")   // false  — correct: a string is not NaN\nNumber.isNaN(NaN)     // true\nNumber.isNaN(0 / 0)   // true</code></pre>\n<p>Two other reliable checks exist:</p>\n<pre><code>Object.is(x, NaN)  // true if x is NaN\nx !== x            // true if x is NaN — it is the only self-unequal value</code></pre>\n<p>The <code>x !== x</code> idiom predates ES2015 and still appears in older code and polyfills. Today the rule is simple: <b>use <code>Number.isNaN</code>, never the global <code>isNaN</code></b>.</p>",
+              "long": false,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "negative-zero",
           "name": "Negative zero",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is -0 and why does it exist?",
+              "answer": "<p class=\"answer-line\">JavaScript has two zeros: <code>0</code> and <code>-0</code>. They exist because JS numbers are IEEE 754 floats, and a float keeps a sign bit even when the value is zero.</p>\n<p><code>-0</code> appears whenever a computation reaches zero \"from the negative side\" — for example <code>-1 * 0</code> or negating <code>0</code>. Most of the time it behaves exactly like <code>0</code>: even <code>===</code> cannot tell them apart. Only <code>Object.is</code> and division reveal the difference.</p>\n<pre><code>-0 === 0          // true  — === cannot tell them apart\nObject.is(-0, 0)  // false — Object.is can\n-0 &lt; 0            // false — it is not \"less than zero\"\n1 / -0            // -Infinity\n1 / 0             // Infinity</code></pre>\n<p>One quirk: <code>Math.sign(-0)</code> returns <code>-0</code> itself, not <code>-1</code> — it passes zeros through unchanged instead of reporting a sign.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "When does -0 actually matter?",
+              "answer": "<p class=\"answer-line\">It matters when the sign carries meaning of its own: tracking direction, animation libraries, certain financial conventions. Most code can safely ignore it.</p>\n<p>The classic example is direction. A velocity of <code>-0</code> can mean \"was heading left, now at zero speed\" — which is different from <code>0</code>, \"fully stopped.\" A plain <code>=== 0</code> check erases that distinction; <code>Object.is</code> keeps it.</p>\n<pre><code>let velocity = -0;          // decelerated to zero while moving left\n\nvelocity === 0              // true  — looks fully stopped\nObject.is(velocity, -0)     // true  — the leftward sign is still there\nObject.is(velocity, 0)      // false</code></pre>\n<p>The rule is narrow: reach for <code>Object.is</code> only when you compare a value to zero <b>and</b> care which side of zero it came from. Everywhere else, treat <code>-0</code> and <code>0</code> as the same number.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "wrapper-objects",
           "name": "Wrapper objects",
-          "cards": []
+          "cards": [
+            {
+              "question": "Which built-in constructors should be called with new?",
+              "answer": "<p class=\"answer-line\">Only <code>Object</code>, <code>Array</code>, <code>Function</code>, <code>Date</code>, <code>RegExp</code>, and <code>Error</code>. <code>String</code>/<code>Number</code>/<code>Boolean</code> must be called as plain functions, and for <code>Symbol</code>/<code>BigInt</code> <code>new</code> throws.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Constructor</th><th>Use <code>new</code>?</th></tr></thead>\n<tbody>\n<tr><td class=\"mono\">Object, Array, Function, Date, RegExp, Error</td><td><b>Yes</b> — or prefer the literal form when one exists: <code>{}</code>, <code>[]</code>, <code>/.../</code>, <code>() =&gt; {}</code></td></tr>\n<tr><td class=\"mono\">String, Number, Boolean</td><td><b>Never</b> — call as plain functions for explicit conversion: <code>String(42)</code>, <code>Number(\"3\")</code>, <code>Boolean(0)</code></td></tr>\n<tr><td class=\"mono\">Symbol, BigInt</td><td><b>Never</b> — <code>new</code> actually throws. Call as functions: <code>Symbol(\"id\")</code>, <code>BigInt(42)</code></td></tr>\n</tbody>\n</table></div>\n<p>The middle row is the dangerous one: <code>new String(\"hi\")</code> does not throw — it quietly creates a wrapper <b>object</b> instead of a primitive, which behaves subtly differently. <code>Symbol</code> and <code>BigInt</code> at least fail loudly:</p>\n<pre><code>String(42);       // \"42\"\nNumber(\"3\");      // 3\nBoolean(0);       // false\nnew Symbol(\"id\"); // TypeError: Symbol is not a constructor</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Why does 'hi'.toUpperCase() work if 'hi' is a primitive?",
+              "answer": "<p class=\"answer-line\">Because of <b>auto-boxing</b>: when you access a property or method on a primitive, the engine temporarily wraps it in the matching wrapper object, calls the method, and discards the wrapper.</p>\n<pre><code>\"hi\".toUpperCase(); // \"HI\" — engine briefly wraps \"hi\" in a String object</code></pre>\n<p>The wrapper exists only for that one access. The value in your variable stays a plain primitive the whole time — and you almost never need to box manually.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Why is new String('x') === 'x' false?",
+              "answer": "<p class=\"answer-line\">Because <code>new String(\"x\")</code> creates a wrapper <b>object</b> — a different type from the primitive string, and <code>===</code> across types is always <code>false</code>.</p>\n<pre><code>let a = \"hi\";              // primitive string\nlet b = new String(\"hi\");  // String OBJECT (wrapper)\n\ntypeof a;  // \"string\"\ntypeof b;  // \"object\"\na === b;   // false — compared across types\na == b;    // true  — coercion strips the wrapper, then compares</code></pre>\n<p><code>==</code> returns <code>true</code> because loose equality coerces the wrapper back to a primitive before comparing.</p>\n<p>The rule: <b>never construct primitive wrappers</b>.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "Is everything in JavaScript an object?",
+              "answer": "<p class=\"answer-line\">No — it's a myth. <b>Primitives are not objects.</b> They auto-box temporarily for method access, but the underlying value stays a primitive.</p>\n<p>The proof is mutation: any property you assign goes onto the temporary wrapper, which is thrown away immediately after.</p>\n<pre><code>let s = \"hi\";\ns.foo = 1;   // silently fails (throws TypeError in strict mode)\ns.foo;       // undefined — the wrapper was already discarded</code></pre>\n<p>If strings were real objects, <code>s.foo</code> would read back <code>1</code>. Instead the assignment lands on a wrapper that no longer exists by the next line.</p>\n<p>Correct mental model: <b>primitives are not objects, but the language makes them look like objects sometimes via auto-boxing.</b></p>",
+              "long": false,
+              "tag": "interview"
+            }
+          ]
         },
         {
           "id": "bigint-symbol",
           "name": "BigInt & Symbol",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is bigint and when do you need it?",
+              "answer": "<p class=\"answer-line\"><code>bigint</code> is the primitive type for integers of <b>arbitrary size</b>. You need it when a value can exceed what a regular number stores exactly.</p>\n<p>A regular <code>number</code> is a 64-bit float, so it represents integers exactly only up to <code>Number.MAX_SAFE_INTEGER</code> (2<sup>53</sup> − 1). Past that point, different integers start collapsing into the same value:</p>\n<pre><code>Number.MAX_SAFE_INTEGER;                 // 9007199254740991\n9007199254740992 === 9007199254740993;   // true — precision is gone\n9007199254740992n + 1n;                  // 9007199254740993n — exact</code></pre>\n<p>Create a bigint with the <code>n</code> suffix (<code>42n</code>) or by calling <code>BigInt(42)</code>. Its <code>typeof</code> is <code>\"bigint\"</code>.</p>\n<p>Bigint and number do not mix in arithmetic — JavaScript refuses to guess which precision you want and throws. Convert one side explicitly first:</p>\n<pre><code>1n + 2;            // TypeError: Cannot mix BigInt and other types, use explicit conversions\n1n + BigInt(2);    // 3n\nNumber(10n) + 2;   // 12</code></pre>\n<p>Typical uses: database IDs, timestamps in nanoseconds, cryptography — anywhere integers can grow past 2<sup>53</sup>.</p>",
+              "long": false,
+              "tag": "modern"
+            },
+            {
+              "question": "What is symbol and what is it for?",
+              "answer": "<p class=\"answer-line\">A <code>symbol</code> is a primitive value that serves as a <b>unique identifier</b>. Every call to <code>Symbol()</code> produces a brand-new value, guaranteed not to equal any other.</p>\n<p>You can pass a description — it is only a label for debugging. Two symbols with the same description are still different values:</p>\n<pre><code>let a = Symbol(\"id\");\nlet b = Symbol(\"id\");\n\na === b;          // false — each symbol is unique\ntypeof a;         // \"symbol\"\na.description;    // \"id\" — just the label</code></pre>\n<p>The main use is <b>collision-free object property keys</b>. A symbol key can never accidentally clash with a string key or with a symbol someone else created — even if the descriptions match:</p>\n<pre><code>let user = { name: \"Ann\" };\nlet id = Symbol(\"id\");\n\nuser[id] = 123;   // cannot collide with any other key</code></pre>\n<p>This makes symbols ideal for attaching data to objects you don't own, such as objects coming from third-party code.</p>",
+              "long": false,
+              "tag": "modern"
+            },
+            {
+              "question": "Why does new Symbol() throw?",
+              "answer": "<p class=\"answer-line\"><code>Symbol</code> and <code>BigInt</code> are not constructors — call them as plain functions. Using <code>new</code> throws a <code>TypeError</code>.</p>\n<pre><code>new Symbol();    // TypeError: Symbol is not a constructor\nnew BigInt(1);   // TypeError: BigInt is not a constructor\n\nSymbol(\"id\");    // works — a symbol\nBigInt(42);      // works — 42n</code></pre>\n<p>Compare with the older trio: <code>new String</code>, <code>new Number</code>, <code>new Boolean</code> <b>do</b> work, but produce wrapper objects you almost never want — <code>typeof</code> says <code>\"object\"</code> and <code>===</code> against the primitive fails:</p>\n<pre><code>typeof new String(\"hi\");    // \"object\", not \"string\"\nnew String(\"hi\") === \"hi\";  // false</code></pre>\n<p><code>symbol</code> and <code>bigint</code> arrived after this mistake was well understood, so they forbid <code>new</code> outright — you cannot create a symbol or bigint wrapper object by accident.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         }
       ]
     },
