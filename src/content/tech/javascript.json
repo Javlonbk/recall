@@ -671,22 +671,104 @@
         {
           "id": "strict-equality",
           "name": "Strict equality",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is the real difference between == and ===?",
+              "answer": "<p class=\"answer-line\">Both operators check types. They differ in exactly one place: what happens when the types mismatch — <code>===</code> returns <code>false</code>, while <code>==</code> runs a coercion algorithm and compares again.</p>\n<p>The popular framing \"<code>===</code> checks types, <code>==</code> doesn't\" is wrong. <code>==</code> checks types too — its first step is \"same type? then compare exactly like <code>===</code>\". The type check is what decides whether coercion fires at all.</p>\n<pre><code>1 === \"1\"   // false — types differ, stop\n1 ==  \"1\"   // true  — types differ, coerce \"1\" → 1, compare again</code></pre>\n<p>So the real question behind choosing an operator is not \"do I want type checking\" — both do it. It is: <b>do I want coercion to fire when types differ?</b> <code>===</code> says no. <code>==</code> says yes, by the rules of the abstract equality algorithm — covered in the Abstract equality cards.</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "How does === work exactly?",
+              "answer": "<p class=\"answer-line\"><code>===</code> is one rule with two steps: if the types differ, return <code>false</code> — done. If the types are the same, compare the values directly.</p>\n<p>No coercion ever runs. A number is never equal to a string, and <code>null</code> is never equal to <code>undefined</code>:</p>\n<pre><code>1 === \"1\"            // false — number vs string\nnull === undefined   // false — different types\n5 === 5              // true\n\"a\" === \"a\"          // true</code></pre>\n<p>Two oddities sit inside step 2:</p>\n<p><b><code>NaN === NaN</code> is <code>false</code>.</b> NaN is, by IEEE-754, not equal to anything — including itself. To detect NaN, use <code>Number.isNaN(x)</code>, not a comparison.</p>\n<p><b><code>+0 === -0</code> is <code>true</code>.</b> Signed zero is collapsed: <code>===</code> treats the two zeros as the same value.</p>\n<pre><code>NaN === NaN   // false\n+0 === -0     // true</code></pre>\n<p>These two corners are exactly where <code>Object.is</code> and SameValueZero diverge from <code>===</code> — covered in their own cards in this topic.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "How does === compare objects?",
+              "answer": "<p class=\"answer-line\">For objects, \"compare values\" means <b>reference equality</b>: two operands are equal only if they are the same object in memory. Same shape is not enough.</p>\n<pre><code>({}) === ({})       // false — two different objects\n[1, 2] === [1, 2]   // false — two different arrays\n\nconst a = {};\na === a             // true  — same reference\nconst b = a;\na === b             // true  — b points to the same object</code></pre>\n<p>This is not special behavior of <code>===</code> — an object's \"value\" simply is its reference. <code>==</code> compares objects the same way when both sides are objects.</p>\n<p>Deep structural equality — \"do these two objects have the same contents?\" — has no operator in the language. You write it yourself or use a library like <code>lodash.isEqual</code>.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "abstract-equality",
           "name": "Abstract equality",
-          "cards": []
+          "cards": [
+            {
+              "question": "What algorithm runs for a == b?",
+              "answer": "<p class=\"answer-line\">If the types match, <code>==</code> behaves exactly like <code>===</code>. If they differ, it coerces one side by a fixed rule and re-runs — checking the rules in strict priority order.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>#</th><th>Case</th><th>What happens</th></tr></thead>\n<tbody>\n<tr><td>1</td><td>Same type</td><td>Behave exactly like <code>===</code></td></tr>\n<tr><td>2</td><td><code>null</code> / <code>undefined</code></td><td>Equal to each other and to <b>nothing else</b> — no coercion (see The == null idiom subtopic)</td></tr>\n<tr><td>3</td><td>Number vs string</td><td><code>ToNumber</code> the string, re-run</td></tr>\n<tr><td>4</td><td>Boolean on either side</td><td><code>ToNumber</code> the boolean — always, never <code>ToString</code> — re-run</td></tr>\n<tr><td>5</td><td>Object vs primitive (number / string / symbol / bigint)</td><td><code>ToPrimitive</code> the object with default hint, re-run</td></tr>\n<tr><td>6</td><td>Anything else</td><td><code>false</code></td></tr>\n</tbody>\n</table></div>\n<p>The <code>ToNumber</code> and <code>ToPrimitive</code> mechanics themselves are covered in the Coercion topic — here only the order matters.</p>\n<p>Two consequences to burn in. First, <b>the boolean side moves first</b>, regardless of what is on the other side:</p>\n<pre><code>\"true\" == true;   // false\n// true   → 1      (boolean rule, step 4)\n// \"true\" → NaN    (string rule, step 3)\n// NaN == 1        → false</code></pre>\n<p>Second, <b>booleans are never coerced to strings under <code>==</code></b> — only to numbers. There is no path in the algorithm where a boolean ever touches <code>ToString</code>.</p>",
+              "long": true,
+              "tag": ""
+            },
+            {
+              "question": "Walk through [] == false.",
+              "answer": "<p class=\"answer-line\"><code>[] == false</code> is <code>true</code>. The boolean rule fires first, then the object rule, then the string rule — and both ends meet at the number <code>0</code>.</p>\n<pre><code>[] == false\n// 1. Boolean rule: false → 0           ⇒  [] == 0\n// 2. Object rule: ToPrimitive([])\n//    valueOf() returns the array itself (not a primitive)\n//    → fall through to toString() → \"\"  ⇒  \"\" == 0\n// 3. String rule: \"\" → 0                ⇒  0 == 0\n// 4. Same type → true</code></pre>\n<p>The key insight: <code>[]</code> does not go directly to <code>0</code>. It goes <code>[] → \"\" → 0</code> — two coercion steps. The intermediate <code>\"\"</code> is what unifies the chain <code>0 == \"\" == [] == false</code>: four different inputs collapsing through different paths to the number <code>0</code>.</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "Walk [1, 2] == \"1,2\" and [] == ![].",
+              "answer": "<p class=\"answer-line\">Both are <code>true</code>. The first is a single object-rule step; the second is <code>[] == false</code> in disguise, because <code>!</code> evaluates first.</p>\n<pre><code>[1, 2] == \"1,2\"\n// Object rule: ToPrimitive([1, 2])\n// valueOf() returns the array → fall through to toString() → \"1,2\"\n// \"1,2\" == \"1,2\" — same type → true</code></pre>\n<p>Note <code>[1, 2].toString()</code> is <code>\"1,2\"</code> with no space. <code>[1, 2] == \"1, 2\"</code> is <code>false</code> — the strings differ at the same-type compare.</p>\n<pre><code>[] == ![]\n// ! evaluates FIRST: [] is truthy (objects are not on\n// the falsy list), so ![] is false\n[] == false\n// ...exactly the [] == false walk → true</code></pre>\n<p>The \"WTF\" framing here is misleading. Two separate, ordinary things happen: <code>!</code> is a normal unary operator that runs first, and <code>==</code> does its normal coercion dance. Neither is unusual on its own.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "Why is == not transitive, and why does it matter?",
+              "answer": "<p class=\"answer-line\">Coercion paths can connect non-equal endpoints through a shared value, so <code>a == b</code> and <code>b == c</code> does <b>not</b> imply <code>a == c</code>.</p>\n<pre><code>0 == \"\";      // true   — \"\" → 0\n0 == \"0\";     // true   — \"0\" → 0\n\"\" == \"0\";    // false  — same type: plain string compare</code></pre>\n<p>Both strings coerce to <code>0</code> against a number. But against each other, no coercion runs — same type, and <code>\"\"</code> and <code>\"0\"</code> are different strings.</p>\n<p>Why it matters: <code>==</code> is therefore not a proper equivalence relation, so it cannot be the equality of any structure that requires uniqueness — <code>Set</code>, <code>Map</code> keys, deduplication. A <code>Set</code> could not maintain its no-duplicates invariant under a non-transitive equality. That is the formal reason collections use SameValueZero instead.</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "When is == actually safe — and preferable?",
+              "answer": "<p class=\"answer-line\"><code>==</code> is preferable in two cases — <code>x == null</code> for nullish checks, and when both sides are known to be the same type. And it is safe more broadly than that: whenever neither side can be <code>true</code>, <code>false</code>, <code>0</code>, <code>\"\"</code>, or <code>[]</code>.</p>\n<p>The \"always use <code>===</code>\" rule is junior-safe but shallow.</p>\n<p><b>Case 1: <code>x == null</code>.</b> Catches <code>null</code> and <code>undefined</code>, nothing else. Idiomatic and shorter than the strict version — covered in The == null idiom subtopic.</p>\n<p><b>Case 2: both sides are the same type.</b> When you have checked or coerced upstream and both operands are guaranteed (say) strings, <code>==</code> is mechanically identical to <code>===</code> — the \"danger\" does not exist, and the choice is style.</p>\n<p>The negative rule — Kyle Simpson's, sharpened: <b>avoid <code>==</code> if either side could be <code>true</code>, <code>false</code>, <code>0</code>, <code>\"\"</code>, or <code>[]</code></b>. Those are the values whose coercion paths intersect at <code>0</code> and produce the surprises:</p>\n<pre><code>[] == false;   // true\n\"\" == 0;       // true\n0 == \"0\";      // true</code></pre>\n<p>The converse is the half people forget: <b>outside those five values, <code>==</code> is fine</b>. The rule is permissive, not a ban — it draws the line at five dangerous values instead of around the whole operator.</p>\n<p>The deeper principle is <b>type-awareness</b>. <code>==</code> is dangerous when you do not know the types of both sides — but the dangerous part is not knowing the types, not the operator. With TypeScript the types are visible in the source, and most <code>==</code> vs <code>===</code> debates evaporate.</p>\n<p>On the famous \"WTF JS\" table: most of those cases are not real code — nobody writes <code>if (x == ![])</code> in production. Real-world <code>==</code> usage is dominated by the <code>== null</code> idiom plus a handful of mixed-type comparisons that show up cleanly in code review — the table attacks code nobody actually writes. The right interview answer is to walk one case mechanically, then point out that the table conflates \"hard to predict at a glance\" with \"broken\". The algorithm is deterministic; the cases are unusual. Those are not the same complaint.</p>",
+              "long": true,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "object-is-samevaluezero",
           "name": "Object.is & SameValueZero",
-          "cards": []
+          "cards": [
+            {
+              "question": "How many equality semantics does JavaScript have?",
+              "answer": "<p class=\"answer-line\">Four, not two: Abstract Equality (<code>==</code>), Strict Equality (<code>===</code>), SameValueZero, and SameValue. They differ in exactly two corners — how they treat <code>NaN</code>, and whether they distinguish <code>+0</code> from <code>-0</code>.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Semantic</th><th>Used by</th><th><code>NaN</code> equals <code>NaN</code>?</th><th><code>+0</code> equals <code>-0</code>?</th><th>Coerces across types?</th></tr></thead>\n<tbody>\n<tr><td>Abstract Equality</td><td><code>==</code></td><td>no</td><td>yes</td><td><b>yes</b></td></tr>\n<tr><td>Strict Equality</td><td><code>===</code></td><td>no</td><td>yes</td><td>no</td></tr>\n<tr><td>SameValueZero</td><td><code>includes</code>, <code>Map</code>, <code>Set</code></td><td><b>yes</b></td><td>yes</td><td>no</td></tr>\n<tr><td>SameValue</td><td><code>Object.is</code>, internal spec ops</td><td><b>yes</b></td><td><b>no</b></td><td>no</td></tr>\n</tbody></table></div>\n<p>Knowing which semantic an API uses is the difference between a lookup failing and succeeding on the same array:</p>\n<pre><code>[1, NaN].indexOf(NaN);     // -1   — indexOf uses ===\n[1, NaN].includes(NaN);    // true — includes uses SameValueZero</code></pre>\n<p>Same array, different equality — different answer. Why <code>NaN !== NaN</code> and what <code>-0</code> is are covered in the Types topic; the <code>==</code> coercion algorithm has its own cards in this topic.</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "What is Object.is?",
+              "answer": "<p class=\"answer-line\"><code>Object.is(a, b)</code> is <code>===</code> with two surgical changes: <code>Object.is(NaN, NaN)</code> is <code>true</code>, and <code>Object.is(+0, -0)</code> is <code>false</code>. The spec calls this semantic SameValue.</p>\n<pre><code>Object.is(NaN, NaN);     // true   — useful for NaN detection\nObject.is(+0, -0);       // false  — signed zero is distinguished\nObject.is({}, {});       // false  — still reference equality for objects</code></pre>\n<p>For objects nothing changes: two values are equal only if they are the same object in memory, exactly like <code>===</code>.</p>\n<p><b>Use case 1: deep-equal implementations.</b> A deep-equal compares objects by recursing into their keys; at the leaves it needs a primitive comparison. <code>===</code> is the wrong choice there — <code>NaN === NaN</code> is <code>false</code>, so a naive version reports <code>{ x: NaN }</code> and <code>{ x: NaN }</code> as unequal. <code>Object.is</code> as the base case fixes that:</p>\n<pre><code>function deepEqual(a, b) {\n  if (Object.is(a, b)) return true;   // base case — NaN-safe\n  // ...otherwise recurse into the keys of a and b...\n}\n\ndeepEqual({ x: NaN }, { x: NaN });    // true — with ===, false</code></pre>\n<p><b>Use case 2: signed zero.</b> Floating-point division preserves direction through zero:</p>\n<pre><code>1 / +0;   // Infinity\n1 / -0;   // -Infinity</code></pre>\n<p>In math libraries and physics simulations, the sign of zero records which direction a value approached zero from — <code>Object.is</code> is how you preserve that distinction when you need it. Ordinary application code rarely does. (What <code>-0</code> is and why <code>NaN !== NaN</code> are covered in the Types topic.)</p>",
+              "long": true,
+              "tag": ""
+            },
+            {
+              "question": "What is SameValueZero?",
+              "answer": "<p class=\"answer-line\">SameValueZero is the equality of collection lookup: <code>Array.prototype.includes</code>, <code>Map.prototype.has</code>, <code>Set.prototype.has</code>. It is <code>===</code> with one change — <code>NaN</code> is treated as equal to itself.</p>\n<p>Signed zero stays collapsed: <code>+0</code> and <code>-0</code> count as the same value, just like under <code>===</code> and unlike <code>Object.is</code>.</p>\n<pre><code>[1, NaN, 3].indexOf(NaN);    // -1     — indexOf uses ===, NaN !== NaN\n[1, NaN, 3].includes(NaN);   // true   — includes uses SameValueZero\nnew Set([NaN, NaN]).size;    // 1      — Set de-dupes with SameValueZero</code></pre>\n<p>Same array, two lookup methods, two answers: <code>indexOf</code> can never find <code>NaN</code>; <code>includes</code> can.</p>\n<p>Why a separate semantic? Collections need their equality to be a real <b>equivalence relation</b> — reflexive, symmetric, transitive — to guarantee no duplicate keys or elements. Neither operator qualifies:</p>\n<pre><code>// == is not transitive\n0 == \"\";      // true\n0 == \"0\";     // true\n\"\" == \"0\";    // false\n\n// === is not reflexive for NaN\nNaN === NaN;  // false</code></pre>\n<p>Under <code>==</code> a <code>Set</code> could not maintain its uniqueness invariant; under <code>===</code> it could never tell whether it already contains <code>NaN</code>. SameValueZero is the minimum fix that keeps both invariants — which is why <code>new Set([NaN, NaN])</code> has size <code>1</code>.</p>",
+              "long": true,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "eq-null-idiom",
           "name": "The == null idiom",
-          "cards": []
+          "cards": [
+            {
+              "question": "How do null and undefined behave under ==?",
+              "answer": "<p class=\"answer-line\">Step 2 of the <code>==</code> algorithm is a hard-coded special case: <code>null</code> and <code>undefined</code> are equal to each other and to <b>nothing else</b>. No coercion happens.</p>\n<pre><code>null == undefined;   // true  — the special case\nnull == 0;           // false\nnull == false;       // false\nnull == \"\";          // false\nundefined == 0;      // false</code></pre>\n<p>This is the only place where mixed-type <code>==</code> does <b>not</b> trigger a coercion. Everywhere else in the algorithm mismatched types get converted and re-compared; here the result is hard-wired — the two nullish values match each other, and any other pairing is <code>false</code>.</p>\n<p>So <code>null</code> never becomes <code>0</code>, <code>\"\"</code>, or <code>false</code> under <code>==</code>, even though <code>Number(null)</code> is <code>0</code>. The conversion rules from the Coercion topic simply do not apply to this pair.</p>\n<p>Under <code>===</code> the special case disappears: <code>null === undefined</code> is <code>false</code> — different types.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Why is x == null the canonical nullish check?",
+              "answer": "<p class=\"answer-line\"><code>x == null</code> is <code>true</code> exactly when <code>x</code> is <code>null</code> or <code>undefined</code> — and for nothing else. One short expression, two values caught, zero false positives.</p>\n<pre><code>if (user.address == null) {\n  // catches both null and undefined\n  // does NOT catch 0, \"\", false, NaN\n}</code></pre>\n<p>It works because of the hard-coded special case: <code>null</code> and <code>undefined</code> match each other under <code>==</code> and nothing else. Other falsy values are not caught — <code>0 == null</code>, <code>\"\" == null</code>, <code>false == null</code>, <code>NaN == null</code> are all <code>false</code>. That makes it strictly safer than a truthiness check like <code>if (!x)</code>.</p>\n<p>The strict equivalent is <code>x === null || x === undefined</code> — longer, identical in behavior. ESLint's <code>eqeqeq</code> rule has a <code>null</code> exception (<code>\"always\", { \"null\": \"ignore\" }</code>) for exactly this idiom.</p>\n<p><b>Interview angle:</b> \"when would you prefer <code>==</code> over <code>===</code>?\" — this is the answer. It is the one case where senior reviewers expect <code>==</code> and would push back on <code>===</code>. Don't expand it to the strict version unless a linter forces you to.</p>",
+              "long": false,
+              "tag": "interview"
+            }
+          ]
         }
       ]
     },
@@ -697,37 +779,134 @@
         {
           "id": "compile-then-execute",
           "name": "Compile then execute",
-          "cards": []
+          "cards": [
+            {
+              "question": "Does JavaScript really run top to bottom?",
+              "answer": "<p class=\"answer-line\">No — it looks interpreted, but the engine makes two passes over your code: a compile pass, then an execute pass. The whole file is read before line 1 executes.</p>\n<p><b>Compile pass</b> — parse the entire source, and for every scope, register the declarations it contains: <code>var</code>, <code>let</code>, <code>const</code>, <code>function</code>, parameters. No assignments run yet.</p>\n<p><b>Execute pass</b> — run the code line by line. Assignments happen here, and lookups resolve against the scopes set up in pass 1.</p>\n<p>You can see the first pass directly: a syntax error at the bottom of a file stops even the first line from running, because the whole file is parsed before anything executes.</p>\n<pre><code>console.log(\"start\");   // never prints\n\nconst x = ;             // SyntaxError — caught in the compile pass</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What does the compile pass fix in place?",
+              "answer": "<p class=\"answer-line\">Scope. Where every variable lives is decided at parse time, up front — and that decision is permanent.</p>\n<p>During the compile pass the engine registers each declaration in its scope. By the time execution starts, every name already exists in the right place; the execute pass only runs assignments and resolves lookups against that fixed map.</p>\n<p>This split is exactly why hoisting works. The engine reads <code>var a = 2;</code> as two operations in two different passes:</p>\n<pre><code>var a = 2;\n// compile pass:  register `a` in this scope\n// execute pass:  a = 2</code></pre>\n<p>So the interview answer to \"why does hoisting work?\": because execution is a second pass — declarations are handled up front, assignments stay in place. The mechanics (<code>function</code> vs <code>var</code> vs <code>let</code>, TDZ) are covered in the Hoisting &amp; TDZ subtopic.</p>",
+              "long": false,
+              "tag": "interview"
+            }
+          ]
         },
         {
           "id": "lexical-scope",
           "name": "Lexical scope",
-          "cards": []
+          "cards": [
+            {
+              "question": "What does it mean that JavaScript is lexically scoped?",
+              "answer": "<p class=\"answer-line\">\"Lexical\" means relating to the source text: a function's outer scope is the scope it is <b>physically written inside</b>, decided at parse time — and that bond is permanent. It never changes based on who calls the function.</p>\n<p>The classic test:</p>\n<pre><code>function foo() {\n  console.log(a);   // which `a`?\n}\n\nfunction bar() {\n  var a = 2;\n  foo();            // foo is CALLED here, where a === 2\n}\n\nvar a = 1;          // foo is WRITTEN here, next to a === 1\nbar();              // logs 1</code></pre>\n<p><code>foo</code> doesn't find <code>a</code> in its own body, so it looks in its outer scope. That outer scope is the <b>global</b> scope — because that's where <code>foo</code> is written — so it finds <code>a = 1</code>. The fact that <code>foo</code> was called from inside <code>bar</code> is invisible to it; the call stack plays no part in lookup.</p>\n<p>The only way to make <code>foo</code> log <code>2</code> is to move its declaration <b>inside</b> <code>bar</code>, so it is lexically nested where <code>a = 2</code> lives. Change the writing, change the lookup.</p>\n<p><b>Lexical scope = nesting in the source text, not nesting in the call stack.</b></p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What is dynamic scope, and does JavaScript have it?",
+              "answer": "<p class=\"answer-line\">Dynamic scope resolves variable names by following the <b>call stack</b> at runtime, so the same function could see different variables depending on who called it. JavaScript deliberately does not have it.</p>\n<p>Bash does (so do some older Lisps). The same shape that logs <code>1</code> in JavaScript prints <code>2</code> in Bash, because <code>foo</code> looks up <code>a</code> in its <b>caller</b>:</p>\n<pre><code># Bash — dynamic scope\nfoo() { echo \"$a\"; }\nbar() { local a=2; foo; }\na=1\nbar    # prints 2 — lookup followed the call stack</code></pre>\n<p>In JavaScript, lookup follows source nesting only: <code>foo</code> written at global scope sees the global <code>a</code>, no matter where it's called from.</p>\n<p>The one JS mechanism that <b>is</b> call-site-dependent is <code>this</code> — which is exactly why people confuse <code>this</code> with scope. See the this &amp; Binding topic.</p>",
+              "long": false,
+              "tag": "interview"
+            }
+          ]
         },
         {
           "id": "scope-chain",
           "name": "The scope chain",
-          "cards": []
+          "cards": [
+            {
+              "question": "How does a variable lookup travel?",
+              "answer": "<p class=\"answer-line\">Scopes nest into a chain. A lookup starts in the current scope and bubbles outward — inner, enclosing, …, global — stopping at the <b>first</b> match.</p>\n<pre><code>const tier = \"global\";\n\nfunction outer() {\n  const tier = \"outer\";\n  function inner() {\n    console.log(tier);   // \"outer\"\n  }\n  inner();\n}\nouter();</code></pre>\n<p><code>inner</code> has no <code>tier</code> of its own, so the lookup moves one scope out, finds <code>tier = \"outer\"</code>, and stops. The global <code>tier</code> is never reached — a nearer match hides a farther one. That hiding is <b>shadowing</b>, covered in its own subtopic.</p>\n<p>If the lookup reaches the global scope and still finds nothing, the chain is exhausted and a read fails with <code>ReferenceError: x is not defined</code>. The exact failure rules — and how assignment behaves differently — are in LHS vs RHS.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What sits at the top of the scope chain?",
+              "answer": "<p class=\"answer-line\">The global scope — every lookup that finds no nearer match ends there. But what lands in it depends on the declaration keyword and the environment.</p>\n<p>In the browser, <code>var</code>-declared globals become properties of <code>window</code>. <code>let</code>/<code>const</code> globals do <b>not</b> — they live in a separate global record:</p>\n<pre><code>// browser\nvar a = 1;\nconst b = 2;\nwindow.a;   // 1\nwindow.b;   // undefined</code></pre>\n<p>In Node, a top-level <code>var</code> in a CommonJS module is <b>module-scoped</b>, not global — a frequent source of \"why isn't this on <code>global</code>?\" confusion:</p>\n<pre><code>// some-module.js (CommonJS)\nvar counter = 1;\nconsole.log(global.counter);   // undefined — counter belongs to the module</code></pre>\n<p>The full treatment of the global object lives in the Global Scope &amp; var topic.</p>",
+              "long": false,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "lhs-vs-rhs",
           "name": "LHS vs RHS",
-          "cards": []
+          "cards": [
+            {
+              "question": "What are LHS and RHS references?",
+              "answer": "<p class=\"answer-line\">Every variable reference is one of two kinds: an <b>LHS</b> reference is a <b>target</b> — the variable is being assigned to (<code>x = 5</code>); an <b>RHS</b> reference is a <b>source</b> — its value is being retrieved (<code>console.log(x)</code>).</p>\n<p>The names come from \"left-hand side\" and \"right-hand side\" of <code>=</code>, but that's only loose — <code>console.log(x)</code> has no <code>=</code> at all and is still an RHS. The real distinction: is a value going <b>into</b> the variable (target) or coming <b>out</b> of it (source)?</p>\n<pre><code>let x;\nx = 5;            // LHS — x is the target, the value goes into it\nconsole.log(x);   // RHS — x is the source, its value is read out (5)</code></pre>\n<p>A function parameter is an LHS too — the argument is assigned into it when the function is called:</p>\n<pre><code>function square(n) {  // n is an LHS — the argument is assigned into n\n  return n * n;       // n here is an RHS — its value is read\n}\nsquare(4);            // returns 16</code></pre>\n<p>The distinction matters when a lookup walks the scope chain and finds nothing: the kind of reference decides what happens — an error, or an accidental global.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What happens when a lookup fails?",
+              "answer": "<p class=\"answer-line\">The kind of reference decides the failure: a failed <b>RHS</b> (reading an undeclared name) throws <code>ReferenceError</code> in both modes; a failed <b>LHS</b> (assigning to an undeclared name) silently <b>creates a global variable</b> in sloppy mode and throws <code>ReferenceError</code> in strict mode.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Reference</th><th>Lookup fails because…</th><th>Sloppy mode</th><th>Strict mode</th></tr></thead>\n<tbody>\n<tr><td><b>RHS</b> (reading)</td><td>name was never declared</td><td><code>ReferenceError</code></td><td><code>ReferenceError</code></td></tr>\n<tr><td><b>LHS</b> (assigning)</td><td>name was never declared</td><td>silently creates a <b>global</b></td><td><code>ReferenceError</code></td></tr>\n</tbody>\n</table></div>\n<p>The LHS auto-global is one of the oldest footguns in the language: a forgotten <code>let</code> doesn't error — it leaks a global.</p>\n<pre><code>function f() {\n  leak = 10;        // LHS, never declared → sloppy mode creates a GLOBAL `leak`\n}\nf();\nconsole.log(leak);     // 10 — leaked out of the function\nconsole.log(missing);  // RHS, never declared → ReferenceError</code></pre>\n<p><b>Strict mode closes the footgun</b> — there a failed LHS throws <code>ReferenceError</code>, just like a failed RHS:</p>\n<pre><code>\"use strict\";\nfunction f() {\n  leak = 10;        // ReferenceError: leak is not defined\n}\nf();</code></pre>\n<p>ES modules and class bodies are strict by default, so modern code gets this protection for free.</p>\n<p>One nuance: a plain RHS read of an undeclared name throws, <b>except</b> <code>typeof undeclaredVar</code>, which returns <code>\"undefined\"</code> instead of throwing — the safe feature-detect. The exception does <b>not</b> apply to <code>let</code>/<code>const</code> still in their TDZ — there even <code>typeof</code> throws (covered in the Hoisting &amp; TDZ subtopic).</p>",
+              "long": true,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "hoisting-tdz",
           "name": "Hoisting & TDZ",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is hoisting, mechanically?",
+              "answer": "<p class=\"answer-line\">Hoisting is not the engine moving lines to the top. It is the visible consequence of the compile pass: every declaration is registered in its scope before any code runs, so the names already exist when execution starts.</p>\n<p>For <code>var</code>, the variable is <b>created</b> and <b>initialized to <code>undefined</code></b> at the start of its scope. The assignment stays where you wrote it and runs only when execution reaches that line. So declarations hoist, assignments do not — reading a <code>var</code> before its assignment gives <code>undefined</code>, not an error:</p>\n<pre><code>console.log(score); // undefined — declared, not yet assigned\nvar score = 42;\nconsole.log(score); // 42</code></pre>\n<p>Function declarations hoist <b>complete</b> — the name and the full function body are registered together, so the function is callable before its line:</p>\n<pre><code>greet(); // \"hi\" — the whole function is ready before this line\n\nfunction greet() {\n  console.log(\"hi\");\n}</code></pre>\n<p>The asymmetry makes sense once you see the two passes: a declaration is static information the parser can register up front, while an assignment is runtime work that has to wait for the execute pass. \"Hoisting\" is just the name for how that split looks from the outside.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What is the temporal dead zone?",
+              "answer": "<p class=\"answer-line\">The temporal dead zone (TDZ) is the stretch from the start of a scope to the <code>let</code>/<code>const</code> declaration line, during which the variable exists but is <b>uninitialized</b> — any access throws <code>ReferenceError</code>.</p>\n<p><code>let</code> and <code>const</code> are also registered at compile time — hoisted, in that sense — just like <code>var</code>. The difference is what happens next: <code>var</code> is initialized to <code>undefined</code> immediately, while <code>let</code>/<code>const</code> are left in a special \"uninitialized\" state. The engine knows the variable, but refuses to touch it until the declaration line runs:</p>\n<pre><code>console.log(user); // ReferenceError: Cannot access 'user' before initialization\nlet user = \"Ann\";</code></pre>\n<p>Note the error message: not \"<code>user</code> is not defined\" but \"cannot access before initialization\". The variable is there — it is in its dead zone.</p>\n<p>Because the variable is registered for its <b>whole</b> scope, the TDZ also blocks reaching an outer variable of the same name:</p>\n<pre><code>let x = 1;\n\nfunction func() {\n  console.log(x); // ReferenceError — the inner x exists here, but is in its TDZ\n  let x = 2;\n}\n\nfunc();</code></pre>\n<p>The zone is <b>temporal</b> — about execution time, not position in the text. Code written above the declaration may mention the variable, as long as it runs after the declaration has executed:</p>\n<pre><code>function read() { return token; } // mentions token before its line — fine\nlet token = \"abc\";\nconsole.log(read()); // \"abc\" — by call time the declaration has run</code></pre>\n<p>Even <code>typeof</code> throws in the TDZ — unlike <code>typeof</code> of a truly undeclared name, which returns <code>\"undefined\"</code>:</p>\n<pre><code>console.log(typeof neverDeclared); // \"undefined\" — safe\nconsole.log(typeof token);         // ReferenceError — token is in its TDZ\nlet token = \"abc\";</code></pre>\n<p>Why the language added it: with <code>var</code>, use-before-declaration silently produced <code>undefined</code> and the bug surfaced somewhere far away. The TDZ turns it into a loud error at the exact line. It also makes <code>const</code> coherent — a <code>const</code> read before its declaration line can never have a value: initializing it to <code>undefined</code> and assigning the real value later would mean a constant with two observable values.</p>\n<p>Telling the TDZ <code>ReferenceError</code> apart from <code>undefined</code> and undeclared names is covered in the Types topic; this card owns the mechanics.</p>",
+              "long": true,
+              "tag": ""
+            },
+            {
+              "question": "What hoists to where?",
+              "answer": "<p class=\"answer-line\">Each declaration form hoists to a different scope and arrives in a different state: <code>var</code> to the nearest function, <code>let</code>/<code>const</code> to their block, function declarations whole, function expressions not at all — only their variable hoists.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Declaration</th><th>Hoists to</th><th>State at scope start</th><th>Early access gives</th></tr></thead>\n<tbody>\n<tr><td class=\"mono\">var x</td><td>nearest <b>function</b> (or global) scope — blocks ignored</td><td><code>undefined</code></td><td class=\"mono\">undefined</td></tr>\n<tr><td class=\"mono\">let x / const x</td><td>its <b>block</b></td><td>uninitialized (TDZ)</td><td class=\"mono\">ReferenceError</td></tr>\n<tr><td class=\"mono\">function f() {}</td><td>its scope, <b>whole</b></td><td>the function itself</td><td>works — callable</td></tr>\n<tr><td class=\"mono\">var f = function () {}</td><td>only the variable <code>f</code></td><td><code>undefined</code></td><td><code>undefined</code> — calling it: <code>TypeError</code></td></tr>\n</tbody>\n</table></div>\n<p><code>var</code> ignores blocks entirely — an <code>if</code> or <code>for</code> body does not contain it; the nearest function does. <code>let</code>/<code>const</code> stay inside the block, in their TDZ until the declaration line:</p>\n<pre><code>function run() {\n  if (true) {\n    var v = 1;\n    let l = 2;\n  }\n  console.log(v); // 1 — var ignored the block, lives in the function\n  console.log(l); // ReferenceError: l is not defined\n}\nrun();</code></pre>\n<p>For a function expression, only the variable hoists — the function value is created when the assignment runs. So calling it early is a <code>TypeError</code>: the name exists and holds <code>undefined</code>, and <code>undefined</code> is not callable.</p>\n<pre><code>sayHi(); // TypeError: sayHi is not a function — sayHi is hoisted as undefined\nvar sayHi = function () {\n  console.log(\"hi\");\n};</code></pre>\n<p>Compare with a name that was never declared at all — that lookup fails entirely, so it is a <code>ReferenceError</code>:</p>\n<pre><code>nowhere(); // ReferenceError: nowhere is not defined — the name does not exist at all</code></pre>\n<p>The error type tells you which case you are in: <code>TypeError</code> means the name hoisted but holds no function yet; a <code>ReferenceError</code> saying \"is not defined\" means the name does not exist at all. Declarations vs expressions in depth: see the Function Expressions &amp; Scope topic. The rest of <code>var</code>'s quirks: see the Global Scope &amp; var topic.</p>",
+              "long": false,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "shadowing",
           "name": "Shadowing",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is shadowing?",
+              "answer": "<p class=\"answer-line\">When an inner scope declares a variable with the same name as an outer one, the inner declaration <b>shadows</b> the outer: inside that scope, the name refers to the inner variable only.</p>\n<p>It falls straight out of how lookup works: the search walks outward and stops at the <b>first</b> match. The outer variable still exists and keeps its value — it just can't be reached from inside the shadow, because lookup never walks past the inner match.</p>\n<pre><code>let answer = \"outer\";\n\nfunction show() {\n  let answer = \"inner\";   // shadows the outer `answer`\n  console.log(answer);    // \"inner\" — lookup stops at the first match\n}\n\nshow();                   // \"inner\"\nconsole.log(answer);      // \"outer\" — still exists, untouched</code></pre>\n<p>Parameters are declarations too, so they shadow the same way:</p>\n<pre><code>let name = \"global\";\n\nfunction greet(name) {    // the parameter shadows the outer `name`\n  console.log(name);\n}\n\ngreet(\"param\");           // \"param\"</code></pre>\n<p>Shadowing is legal across any scope boundary — even <code>let</code> shadowing an outer <code>var</code>. The boundary is what makes it legal: redeclaring with <code>let</code> in the <b>same</b> scope is a <code>SyntaxError</code>, but a different scope means a different variable.</p>\n<pre><code>var count = 1;\n\n{\n  let count = 2;          // legal: different scope\n  console.log(count);     // 2\n}\n\nconsole.log(count);       // 1</code></pre>",
+              "long": true,
+              "tag": ""
+            },
+            {
+              "question": "Can you ever reach a shadowed variable?",
+              "answer": "<p class=\"answer-line\">From inside the shadow — normally no. There is no syntax for \"the <code>x</code> one scope up\"; lookup always stops at the nearest match.</p>\n<p>One escape hatch exists, in browsers only: a shadowed <b>global <code>var</code></b> is still reachable as <code>window.x</code>. A <code>var</code> in a browser script also becomes a property of <code>window</code>, and property access doesn't use the scope chain — so the shadow doesn't apply to it.</p>\n<pre><code>// browser\nvar x = \"global\";          // also becomes window.x\n\nfunction f() {\n  let x = \"local\";         // shadows the global x\n  console.log(x);          // \"local\"\n  console.log(window.x);   // \"global\" — the property route, not a scope lookup\n}\nf();</code></pre>\n<p><code>let</code>/<code>const</code> globals never become <code>window</code> properties, so once shadowed they are truly unreachable. Why <code>var</code> globals land on <code>window</code> at all is covered in the Global Scope &amp; var topic.</p>\n<p>In practice, reaching for this trick is a sign to rename: shadowing makes the same name mean different things a few lines apart. It's enough of a readability hazard that many teams ban it with the <code>no-shadow</code> ESLint rule.</p>",
+              "long": false,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "execution-context",
           "name": "Execution context",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is an execution context?",
+              "answer": "<p class=\"answer-line\">An execution context is the environment a piece of code runs in. The engine creates one before executing the code, and it holds everything that code needs to run — its variables and the value of <code>this</code>.</p>\n<p>There are three kinds: one <b>global context</b> for the top-level code, a <b>new context for every function call</b>, and a context for <code>eval</code>. Per <b>call</b>, not per function — calling the same function three times creates three separate contexts, each with its own fresh local variables:</p>\n<pre><code>function count() {\n  var n = 0;        // a fresh `n` in this call's context\n  n++;\n  return n;\n}\ncount(); // 1\ncount(); // 1 — new call, new context, new `n`</code></pre>\n<p>Each context is built in two phases:</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Phase</th><th>What happens</th></tr></thead>\n<tbody>\n<tr><td><b>Creation</b></td><td>The environment record is set up: every declaration in the scope is registered, and <code>this</code> is determined.</td></tr>\n<tr><td><b>Execution</b></td><td>The code runs line by line; assignments happen here.</td></tr>\n</tbody>\n</table></div>\n<p>The creation phase is the per-call counterpart of the compile pass from \"Compile, then execute\": names exist before the first line runs, which is why hoisting works.</p>\n<pre><code>console.log(x);   // undefined — `x` was registered in the creation phase\nvar x = 5;        // the assignment waits for the execution phase</code></pre>\n<p>Contexts stack. The <b>call stack is the stack of execution contexts</b>: the global context sits at the bottom, every call pushes a new context on top, every return pops one off. The context on top is the one currently running.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "How do execution contexts relate to scope?",
+              "answer": "<p class=\"answer-line\">Each execution context holds an <b>environment record</b> — the internal object where that scope's variables actually live. The scope chain is a chain of these environment records.</p>\n<p>The chain's <b>shape is fixed lexically</b>. Every function carries a hidden internal reference (<code>[[Environment]]</code>) to the environment of the place where it was <b>written</b>, set once when the function is created. So no matter which context calls the function, its lookup chain is the one from the source text: own record → outer → … → global, following that reference — never the call stack.</p>\n<pre><code>function foo() {\n  console.log(a);\n}\n\nfunction bar() {\n  var a = 2;\n  foo();            // bar's context is on the stack — but not in foo's chain\n}\n\nvar a = 1;\nbar();              // 1</code></pre>\n<p>While <code>foo</code> runs, <code>bar</code>'s context sits right below it on the stack. But <code>foo</code> was written at the top level, so its chain goes from its own record straight to the global record — <code>bar</code>'s record is on the stack, not in the chain.</p>\n<p>The two have different lifetimes: contexts and their records are <b>created and destroyed with calls</b>; the lexical structure they plug into is fixed when the code is parsed and never changes.</p>\n<p><code>this</code> also lives in the context, but it is <b>not</b> part of the scope chain and is resolved by call-site rules — see the this &amp; Binding topic. What happens when a function's record must outlive the call that created it is covered in the Closure topic.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         }
       ]
     },
@@ -738,27 +917,104 @@
         {
           "id": "declarations-vs-expressions",
           "name": "Declarations vs expressions",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is the difference between a function declaration and a function expression?",
+              "answer": "<p class=\"answer-line\">A <b>function declaration</b> is a standalone statement that starts with the <code>function</code> keyword and must have a name. A <b>function expression</b> is a function created inside an expression — assigned to a variable, passed as an argument, returned from another function — and its name is optional.</p>\n<pre><code>// Function Declaration — a statement of its own\nfunction sum(a, b) {\n  return a + b;\n}\n\n// Function Expression — the function is a value, assigned to a variable\nlet mul = function(a, b) {\n  return a * b;\n};</code></pre>\n<p>However it's created, a function is a <b>value</b>. The name without parentheses is a <b>reference</b> to the function — only parentheses call it. That means a function can be copied into another variable, and printing one shows its source code:</p>\n<pre><code>function sayHi() {\n  console.log(\"Hello\");\n}\n\nlet func = sayHi;       // no parentheses: copies the function itself\nfunc();                 // Hello — same function, second name\n\nlet result = sayHi();   // parentheses: runs sayHi, stores its result — undefined here\n\nconsole.log(String(sayHi)); // \"function sayHi() {...}\" — the source code</code></pre>\n<p>The parser decides by <b>position</b>. If <code>function</code> appears at the start of a statement, it's a declaration. Anywhere a value is expected — after <code>=</code>, inside parentheses, in an argument list — it's an expression. That's why an IIFE needs wrapping parentheses: <code>(function() { ... })()</code> puts the function in value position, so it can be anonymous and called immediately.</p>\n<p>The optional name on an expression is still useful. A <b>named function expression</b> gives the function an inner name visible only inside its own body — a reliable way to call itself:</p>\n<pre><code>let sayHi = function func(who) {\n  if (!who) return func(\"Guest\");   // self-call survives reassignment of sayHi\n  console.log(`Hello, ${who}`);\n};\n\nconsole.log(typeof func);   // \"undefined\" — the inner name is invisible outside</code></pre>\n<p>Even a fully anonymous expression gets a <code>name</code> property inferred from its assignment: <code>let greet = function() {}</code> gives <code>greet.name === \"greet\"</code>.</p>",
+              "long": false,
+              "tag": "interview"
+            },
+            {
+              "question": "How do they behave differently?",
+              "answer": "<p class=\"answer-line\">The key difference is <b>creation time</b>: a declaration is created during the engine's compile pass, so it's usable anywhere in its scope — even above its line in the source. An expression is created only when execution reaches it.</p>\n<pre><code>sayHi(\"John\");   // \"Hello, John\" — already created\n\nfunction sayHi(name) {\n  console.log(`Hello, ${name}`);\n}</code></pre>\n<p>Call an expression before its line and the function doesn't exist yet — the variable does, but it holds <code>undefined</code>:</p>\n<pre><code>sayBye(\"John\");   // TypeError: sayBye is not a function\n\nvar sayBye = function(name) {\n  console.log(`Bye, ${name}`);\n};</code></pre>\n<p>With <code>let</code>/<code>const</code> the early call throws <code>ReferenceError</code> instead — the variable isn't initialized yet. The mechanics behind both errors are covered in the Scope topic (Hoisting &amp; TDZ).</p>\n<p>Second difference: <b>block visibility</b>. In strict mode, a declaration inside a code block is visible only inside that block:</p>\n<pre><code>\"use strict\";\n\nif (true) {\n  function hi() { console.log(\"hi\"); }\n  hi();   // works — visible inside the block\n}\n\nhi();   // ReferenceError: hi is not defined</code></pre>\n<p>Outside strict mode the declaration leaks into the enclosing function scope — a legacy quirk, don't rely on it. To use a function outside the block it was created in, assign an expression to a variable declared outside the block.</p>\n<p>Third difference: the <b>semicolon</b>. An expression assignment is an ordinary statement, like <code>let x = 5;</code>, so it ends with <code>;</code>. A declaration is not an assignment — no semicolon needed. The semicolon terminates the assignment, not the function syntax.</p>",
+              "long": true,
+              "tag": "trap"
+            },
+            {
+              "question": "Which should you use when?",
+              "answer": "<p class=\"answer-line\">Prefer function declarations as the default. Reach for an expression when the function is genuinely a <b>value</b>: created conditionally, passed inline, or stored in a data structure.</p>\n<p>Declarations win on readability — <code>function calcRent(...)</code> is easier to spot when scanning code than <code>let calcRent = function(...)</code> — and they're callable from anywhere in their scope, so you're free to put the main logic at the top of a file and the helper definitions below.</p>\n<p>Expressions earn their place when creation depends on a condition:</p>\n<pre><code>let age = 16;\n\nlet welcome = (age &lt; 18)\n  ? function() { console.log(\"Hello!\"); }\n  : function() { console.log(\"Greetings!\"); };\n\nwelcome();   // \"Hello!\"</code></pre>\n<p>A declaration can't do this — in strict mode it would stay trapped inside the branch's block.</p>\n<p>The other natural homes for expressions: a callback passed straight into another function, and a function stored as an object property or array element. For short inline callbacks, an arrow is the usual form — <code>[1, 2, 3].map(n =&gt; n * 2)</code>. Arrow specifics are covered in the Arrow functions subtopic.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What is a callback function?",
+              "answer": "<p class=\"answer-line\">A callback is a function passed as an argument to another function, with the expectation that it will be \"called back\" later, when the right moment comes. This works because a function is a <b>value</b> representing an <b>action</b>: handing one over hands over the action, and the receiver decides if and when to run it.</p>\n<pre><code>function ask(question, answer, yes, no) {\n  console.log(question);\n  if (answer) yes();\n  else no();\n}\n\nfunction showOk() { console.log(\"You agreed.\"); }\nfunction showCancel() { console.log(\"You canceled.\"); }\n\n// showOk and showCancel are callbacks — ask calls one of them back\nask(\"Do you agree?\", true, showOk, showCancel);\n// Do you agree?\n// You agreed.</code></pre>\n<p><code>ask</code> doesn't know what agreeing or canceling should do. The caller supplies the actions as values, and <code>ask</code> only picks which one to invoke — in a browser, <code>answer</code> would come from <code>confirm(question)</code> asking a real user.</p>\n<p>The handlers don't need names. A function expression can be written right inside the call — created on the spot, unreachable outside it:</p>\n<pre><code>ask(\n  \"Do you agree?\", false,\n  function() { console.log(\"You agreed.\"); },\n  function() { console.log(\"You canceled.\"); }\n);\n// Do you agree?\n// You canceled.</code></pre>\n<p>This anonymous inline form is the everyday shape of callbacks: array methods like <code>[1, 2, 3].map(n =&gt; n * 2)</code>, timers, and event handlers all take them. How callbacks evolved into promises and <code>async/await</code> is covered in the async topics.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "named-function-expressions",
           "name": "Named function expressions",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is a named function expression?",
+              "answer": "<p class=\"answer-line\">A named function expression (NFE) is a function expression with its own internal name: <code>let sayHi = function func(who) {...}</code>. The name <code>func</code> is visible only inside the function body, and there it always refers to the current function.</p>\n<p>That gives the function a reliable way to call itself. The outer variable can be reassigned or nulled — the internal name keeps working:</p>\n<pre><code>let sayHi = function func(who) {\n  if (who) {\n    console.log(`Hello, ${who}`);\n  } else {\n    func(\"Guest\"); // always the current function\n  }\n};\n\nlet welcome = sayHi;\nsayHi = null;\n\nwelcome(); // Hello, Guest</code></pre>\n<p>Had the body called <code>sayHi(\"Guest\")</code> instead, that line would fail here: by the time it runs, the outer <code>sayHi</code> is <code>null</code> — <code>TypeError: sayHi is not a function</code>. The internal name is immune to this because it is bound to the function itself, not to a variable in the outer scope.</p>\n<p>Outside the body the name does not exist — <code>func()</code> there is a <code>ReferenceError</code>. This internal-only name is a feature of function <b>expressions</b>; for a function <b>declaration</b>, the name is just a regular variable in the enclosing scope.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What is the function name property?",
+              "answer": "<p class=\"answer-line\">Every function has a <code>name</code> property: <code>function sayHi() {}</code> reports <code>\"sayHi\"</code>. Even anonymous expressions get one — the engine takes it from the context of the assignment.</p>\n<pre><code>let f = function() {};\nconsole.log(f.name); // \"f\" — taken from the variable\n\nlet user = {\n  sayBye: function() {}\n};\nconsole.log(user.sayBye.name); // \"sayBye\" — from the property\n\nlet greet = function inner() {};\nconsole.log(greet.name); // \"inner\" — the NFE name wins</code></pre>\n<p>This \"contextual name\" shows up in stack traces and debuggers, which makes the function easy to identify when debugging. When there is no context to take a name from — say, a function created directly inside an array literal — <code>name</code> is an empty string.</p>\n<p>A companion property, <code>length</code>, reports the declared parameter count; rest parameters are not counted:</p>\n<pre><code>function f1(a) {}\nfunction many(a, b, ...more) {}\n\nconsole.log(f1.length); // 1\nconsole.log(many.length); // 2</code></pre>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "arrow-functions",
           "name": "Arrow functions",
-          "cards": []
+          "cards": [
+            {
+              "question": "What are arrow functions?",
+              "answer": "<p class=\"answer-line\">An arrow function is a shorter syntax for a function expression: <code>(args) =&gt; expression</code> creates a function that evaluates the expression and implicitly returns its result.</p>\n<p>The syntax adapts to the parameter count and the body:</p>\n<pre><code>let sum = (a, b) =&gt; a + b;   // expression body: returns a + b implicitly\nlet double = n =&gt; n * 2;     // one parameter: parens optional\nlet sayHi = () =&gt; \"Hi\";      // zero parameters: parens required\n\nlet pow = (a, b) =&gt; {        // braces: statement body\n  let result = a ** b;\n  return result;             // explicit return needed\n};</code></pre>\n<p>Arrows are <b>always expressions</b> — there is no arrow declaration. One is created when execution reaches it, and you use it through a variable or pass it inline. That makes them a natural fit for short callbacks:</p>\n<pre><code>[1, 2, 3].map(n =&gt; n * 2);   // [2, 4, 6]</code></pre>",
+              "long": false,
+              "tag": "modern"
+            },
+            {
+              "question": "What can arrow functions not do?",
+              "answer": "<p class=\"answer-line\">Four things: an arrow function has no own <code>this</code>, no <code>arguments</code> object, cannot be called with <code>new</code>, and has no own <code>super</code>.</p>\n<p><b>No own <code>this</code>.</b> An arrow uses the <code>this</code> of the scope it is written in — the full story is in the this &amp; Binding topic. Because of this, arrows are usually wrong as object methods: the method's <code>this</code> will not be the object it is called on.</p>\n<p><b>No <code>arguments</code> object.</b> Use a rest parameter instead:</p>\n<pre><code>const max = (...args) =&gt; Math.max(...args);\nmax(1, 5, 3);   // 5</code></pre>\n<p><b>Not a constructor.</b> An arrow has no <code>prototype</code> property and throws when called with <code>new</code>:</p>\n<pre><code>const f = () =&gt; {};\nf.prototype;    // undefined — a regular function would have one\nnew f();        // TypeError: f is not a constructor</code></pre>\n<p><b>No own <code>super</code>.</b> Like <code>this</code>, it is taken from the enclosing scope.</p>",
+              "long": false,
+              "tag": "trap"
+            }
+          ]
         },
         {
           "id": "iife",
           "name": "IIFE",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is an IIFE and why the parentheses?",
+              "answer": "<p class=\"answer-line\">An IIFE (Immediately Invoked Function Expression) is a function expression created and called in one go. The wrapping parentheses force the engine to read it as an <b>expression</b> — at statement position the <code>function</code> keyword would start a declaration instead.</p>\n<p>A Function Declaration must have a name and cannot be called in place, so both bare attempts are syntax errors:</p>\n<pre><code>function() { ... }();     // SyntaxError: a declaration needs a name\nfunction go() { ... }();   // SyntaxError: the trailing () parses on its own</code></pre>\n<p>Anything that puts the function in expression position fixes it. Parentheses are the convention, but a leading unary operator also works, and so does the arrow form:</p>\n<pre><code>(function() { console.log(\"a\"); })();   // a — parens around the function\n(function() { console.log(\"b\"); }());   // b — parens around the whole call\n!function() { console.log(\"c\"); }();    // c — ! starts an expression\n+function() { console.log(\"d\"); }();    // d — so does unary +\n(() =&gt; { console.log(\"e\"); })();        // e — arrow form</code></pre>\n<p>This is the same statement-vs-expression parsing rule that makes <code>{} + []</code> behave oddly — see the Coercion topic.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "What were IIFEs for, and do you still need them?",
+              "answer": "<p class=\"answer-line\">IIFEs were the pre-ES6 way to isolate scope: <code>var</code> has no block scope, so wrapping code in a function was the only way to keep variables private and — in browsers — off the global object. Today <code>let</code>/<code>const</code> blocks and ES modules replace almost all of it.</p>\n<p>Variables inside the function exist only there. This trick is the seed of the module pattern (covered in the Modules topic; the <code>var</code> quirks themselves are in the Global Scope &amp; var topic):</p>\n<pre><code>(function() {\n  var message = \"hidden\";\n  console.log(message);   // \"hidden\"\n})();\nconsole.log(message);     // ReferenceError: message is not defined</code></pre>\n<p>Now a plain block with <code>let</code>/<code>const</code> isolates just as well, and every ES module gets its own scope for free:</p>\n<pre><code>{\n  let message = \"hidden\";\n}\n// message is not visible here</code></pre>\n<p>Two uses are still legitimate. <b>One-shot initialization</b> — run a few statements right where a <code>const</code> is assigned:</p>\n<pre><code>const squares = (() =&gt; {\n  const map = new Map();\n  for (let i = 1; i &lt;= 3; i++) map.set(i, i * i);\n  return map;\n})();\nsquares.get(3); // 9</code></pre>\n<p>And the <b>async IIFE</b> — the way to use <code>await</code> in a non-module script, since top-level <code>await</code> works only in modules:</p>\n<pre><code>(async () =&gt; {\n  const data = await Promise.resolve(\"loaded\");\n  console.log(data); // \"loaded\"\n})();</code></pre>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "block-scope",
           "name": "Block scope",
-          "cards": []
+          "cards": [
+            {
+              "question": "What creates a block scope?",
+              "answer": "<p class=\"answer-line\">Any code block <code>{ ... }</code> creates a block scope: <code>if</code>/<code>else</code> bodies, loop bodies, <code>try/catch</code>, even a standalone block. <code>let</code>, <code>const</code>, and <code>class</code> declarations are confined to the nearest block; <code>var</code> ignores blocks entirely.</p>\n<pre><code>if (true) {\n  let secret = 1;\n  var leak = 2;\n}\n\nleak;   // 2 — var ignored the block and attached to the function (or global) scope\nsecret; // ReferenceError: secret is not defined</code></pre>\n<p><code>var</code> respects only <b>function</b> boundaries — a block is invisible to it. That behavior, and the pre-<code>let</code> IIFE workaround, are covered in The old var in the Global Scope &amp; var topic.</p>\n<p>A standalone block is a legitimate tool: wrap a few lines in bare braces to keep temporaries from leaking into the surrounding scope.</p>\n<pre><code>{\n  let total = 2 + 3;\n  console.log(total); // 5\n}\n// total is gone — no leftover name out here</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "How does for (let ...) scope each iteration?",
+              "answer": "<p class=\"answer-line\"><code>for (let i = ...)</code> creates a <b>new binding of <code>i</code> for every iteration</b> — each turn of the loop gets its own copy of the variable. <code>for (var i = ...)</code> creates a single binding shared by all iterations.</p>\n<pre><code>let fns = [];\nfor (let i = 0; i &lt; 3; i++) fns.push(() =&gt; i);\nfns.map(f =&gt; f()); // [0, 1, 2] — each function holds its own i\n\nfor (var j = 0; j &lt; 3; j++) setTimeout(() =&gt; console.log(j)); // 3, 3, 3 — one shared j</code></pre>\n<p>Between iterations the engine copies the latest value into the fresh binding, so <code>i++</code> still counts normally — the loop works as if there were one variable, but each iteration's functions see a private snapshot.</p>\n<p>The header <code>let</code> belongs to the loop itself: after the loop, <code>i</code> is gone (<code>ReferenceError</code>), while <code>var j</code> survives with its final value <code>3</code>.</p>\n<p>Why the <code>var</code> version prints <code>3, 3, 3</code> — functions capturing the variable, not the value — is covered in the Closure topic.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         }
       ]
     },
@@ -769,17 +1025,62 @@
         {
           "id": "globalthis",
           "name": "globalThis",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is globalThis?",
+              "answer": "<p class=\"answer-line\"><code>globalThis</code> is the standardized name for the global object, added in ES2020. It is the same name in every JavaScript environment.</p>\n<p>Historically each environment named its global object differently, so cross-environment code had to guess which one existed:</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Environment</th><th>Global object name</th></tr></thead>\n<tbody>\n<tr><td>Browser</td><td class=\"mono\">window</td></tr>\n<tr><td>Web worker</td><td class=\"mono\">self</td></tr>\n<tr><td>Node.js</td><td class=\"mono\">global</td></tr>\n<tr><td>Everywhere (ES2020)</td><td class=\"mono\">globalThis</td></tr>\n</tbody>\n</table></div>\n<p>All the names point at the same object in their environment — <code>globalThis</code> is just the portable alias:</p>\n<pre><code>globalThis.answer = 42;\n\nconsole.log(globalThis.answer);     // 42\nconsole.log(globalThis === global); // true (in Node)\nconsole.log(globalThis === window); // true (in a browser)</code></pre>\n<p>Use <code>globalThis</code> when code must run across environments — a library loaded in browsers, workers, and Node. In code that only ever runs in one environment, the local name (<code>window</code> in browser scripts) is still fine.</p>",
+              "long": false,
+              "tag": "modern"
+            },
+            {
+              "question": "When should you actually use the global object?",
+              "answer": "<p class=\"answer-line\">Sparingly. There are two legitimate uses: feature detection with polyfills, and making an intentional cross-script global explicit.</p>\n<p><b>Feature detection and polyfills.</b> The global object is where built-in APIs live, so checking it tells you whether the environment supports a feature — and assigning to it fills the gap:</p>\n<pre><code>// If the environment lacks an API, provide it\nif (!globalThis.myApi) {\n  globalThis.myApi = { ready: true };\n}\n\nconsole.log(myApi.ready); // true — global-object properties are readable by bare name</code></pre>\n<p><b>An intentional global.</b> If a value genuinely must be shared between separate scripts, write it as an explicit property (browser example):</p>\n<pre><code>window.currentUser = { name: \"John\" };</code></pre>\n<p>Writing <code>window.currentUser</code> instead of declaring a bare variable makes the intent visible: this is global <b>on purpose</b>, not by accident.</p>\n<p>For everything else, prefer modules and explicit imports (see the Modules topic). Functions that take inputs and return outputs are easier to read and test than functions reaching into globals — keep global variables to a minimum.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "the-old-var",
           "name": "The old var",
-          "cards": []
+          "cards": [
+            {
+              "question": "How is var scoped?",
+              "answer": "<p class=\"answer-line\"><code>var</code> has no block scope: a <code>var</code> is either function-scoped or global. Blocks like <code>if</code>, <code>for</code> and <code>while</code> do not contain it.</p>\n<p>Declare a <code>var</code> inside a block and it leaks into the enclosing function — or becomes global if there is no function around it:</p>\n<pre><code>if (true) {\n  var test = true;\n}\nconsole.log(test); // true — var ignored the block</code></pre>\n<p>With <code>let test</code> the last line would throw <code>ReferenceError: test is not defined</code>, because <code>let</code> respects the block.</p>\n<p>Loops are blocks too, so the counter survives them:</p>\n<pre><code>for (var i = 0; i &lt; 3; i++) {}\nconsole.log(i); // 3</code></pre>\n<p>The only wall a <code>var</code> cannot cross is a function. Declared anywhere inside a function — even deep inside nested blocks — it is visible everywhere in that function, but not outside it.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "How does var hoist and redeclare?",
+              "answer": "<p class=\"answer-line\"><code>var</code> declarations are processed at the start of their function and begin as <code>undefined</code>, while assignments stay where they are written. And <code>var</code> silently tolerates declaring the same name twice.</p>\n<p>So reading a <code>var</code> before its assignment line gives <code>undefined</code>, not an error:</p>\n<pre><code>function sayHi() {\n  console.log(phrase); // undefined — declared, not yet assigned\n  var phrase = \"Hello\";\n  console.log(phrase); // Hello\n}\nsayHi();</code></pre>\n<p>The engine acts as if <code>var phrase</code> were moved to the top of <code>sayHi</code>, while <code>phrase = \"Hello\"</code> runs in place. Why declarations get registered before any code runs is covered in Hoisting &amp; TDZ in the Scope topic.</p>\n<p>Redeclaration is simply ignored — the second <code>var</code> acts as a plain assignment:</p>\n<pre><code>var user = \"Pete\";\nvar user = \"John\"; // no error\nconsole.log(user); // John</code></pre>\n<p>With <code>let</code>, the second declaration throws <code>SyntaxError: Identifier 'user' has already been declared</code>.</p>\n<p>Both behaviors hide bugs: a read placed too early quietly gives <code>undefined</code>, and a duplicate declaration quietly overwrites a variable that already exists. <code>let</code>/<code>const</code> turn both into errors you see immediately.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "Why does var exist, and should you use it?",
+              "answer": "<p class=\"answer-line\"><code>var</code> is the original declaration from the first versions of JavaScript; <code>let</code> and <code>const</code> replaced it in 2015 (ES6). It survives only for backward compatibility with old code.</p>\n<p>Its lack of block scope shaped old code style. Since the only thing that contains a <code>var</code> is a function, programmers wrapped code in a function and called it immediately — the IIFE:</p>\n<pre><code>(function () {\n  var message = \"Hello\";\n  console.log(message); // Hello\n})();\n// message is not visible here</code></pre>\n<p>The wrapper exists purely to give <code>var</code> a private scope. The pattern and its variants are covered in the IIFE subtopic of the Function Expressions &amp; Scope topic; with block-scoped <code>let</code>/<code>const</code>, a plain <code>{ }</code> block does the same job.</p>\n<p>The modern rule: <code>const</code> by default, <code>let</code> when the variable is reassigned, <code>var</code> only when maintaining legacy code. In new code there is no case where <code>var</code> is the better choice.</p>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         },
         {
           "id": "global-object",
           "name": "The global object",
-          "cards": []
+          "cards": [
+            {
+              "question": "What is the global object?",
+              "answer": "<p class=\"answer-line\">The global object is the object whose properties are available everywhere, without any import: built-ins like <code>Array</code> and <code>JSON</code>, plus environment-specific members like <code>document</code> and <code>innerHeight</code> in a browser, where it's named <code>window</code>.</p>\n<p>In a browser, top-level <code>var</code> declarations and function declarations in a classic (non-module) script become <b>properties of the global object</b>. Top-level <code>let</code>/<code>const</code> are still global in scope — every script sees them — but they live in a separate record, not on <code>window</code>:</p>\n<pre><code>// browser, classic &lt;script&gt; (not a module)\nvar test = 5;\nlet user = \"John\";\n\nalert(window.test); // 5 — var became a window property\nalert(window.user); // undefined — let did not\n\nalert(user); // \"John\" — global in scope, just not on window</code></pre>\n<p>Top-level declarations in an ES module never reach the global object: <code>var</code> and function declarations stay module-scoped. So the var-becomes-a-property behavior matters mainly for old non-module scripts.</p>",
+              "long": false,
+              "tag": "trap"
+            },
+            {
+              "question": "How should you treat globals in practice?",
+              "answer": "<p class=\"answer-line\">Keep globals rare — a function that takes input and returns output is easier to test and reuse than one that reads ambient state. When a value really must be global, assign it to the global object explicitly, so the intent is visible:</p>\n<pre><code>window.currentUser = { name: \"John\" };\n\n// any other script:\nalert(currentUser.name); // John</code></pre>\n<p>Property access also works in the other direction — to <b>read</b> the global when a local variable shadows it. A bare name goes through scope lookup and stops at the nearest match, but <code>window.currentUser</code> is a property read, so it always reaches the global:</p>\n<pre><code>let currentUser = null;             // local, shadows the global\n\nalert(currentUser);                 // null — scope lookup finds the local\nalert(window.currentUser.name);     // John — property access bypasses the shadow</code></pre>\n<p>To read a global that may not exist, go through the object: a missing property is just <code>undefined</code>, while a bare read of an undeclared name throws. (<code>typeof analytics</code> is the other safe read.)</p>\n<pre><code>alert(globalThis.analytics); // undefined — no error\nalert(analytics);            // ReferenceError: analytics is not defined</code></pre>\n<p>Node note: in a CommonJS module, top-level <code>var</code> is <b>module-scoped</b>, not a property of <code>global</code>. Node wraps every file in a function, so its \"top level\" is really a function body — don't expect the browser behavior there:</p>\n<pre><code>// app.cjs\nvar x = 5;\nconsole.log(global.x); // undefined — x belongs to this module</code></pre>",
+              "long": false,
+              "tag": ""
+            }
+          ]
         }
       ]
     },
