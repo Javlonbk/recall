@@ -137,6 +137,8 @@
      Module state (Q&A)
      ============================================================ */
   let TECH = null, TECHID = null;
+  const SRC = window.RECALL_SRC === 'interview' ? 'interview' : 'topics';
+  const SRC_LABEL = SRC === 'interview' ? 'Interview' : 'Q&A';
   let qaCards = [], sectionsList = [], railLinks = [], currentSub = null, topicNav = null;
   let knownSet = new Set(), filterKnown = false, revealedPref = false;
 
@@ -149,6 +151,7 @@
     const techs = allTechs();
     mount.innerHTML = techs.map((t, i) => {
       const count = (t.topics || []).reduce((a, top) => a + top.subtopics.reduce((b, s) => b + s.cards.length, 0), 0);
+      const ivCount = (t.interview || []).reduce((a, top) => a + top.subtopics.reduce((b, s) => b + s.cards.length, 0), 0);
       return `<div class="tech-row">
         <span class="idx">${pad2(i + 1)}</span>
         <div class="tr-body">
@@ -157,7 +160,7 @@
         </div>
         <div class="tr-links">
           <a class="tr-qa" href="qa.html?tech=${t.id}">Q&amp;A <span class="tr-n">${count}</span></a>
-          <a class="tr-book" href="book.html?tech=${t.id}">Book</a>
+          <a class="tr-book" href="interview.html?tech=${t.id}">Interview${ivCount ? ` <span class="tr-n">${ivCount}</span>` : ''}</a>
         </div>
       </div>`;
     }).join('');
@@ -172,12 +175,17 @@
     if (!mount) return false;
     TECHID = currentTechId(); TECH = getTech(TECHID);
     if (!TECH) { mount.innerHTML = '<p style="padding:60px">No content found.</p>'; return false; }
+    if (!(TECH[SRC] && TECH[SRC].length)) {
+      mount.innerHTML = '<div class="empty-surface"><p>No ' + SRC_LABEL + ' content yet for <b>' + TECH.name + '</b>.</p></div>';
+      document.title = 'recall — ' + TECH.name + ' · ' + SRC_LABEL;
+      return false;
+    }
     localStorage.setItem(pkey('last-tech'), TECHID);
-    document.title = 'recall — ' + TECH.name + ' · Q&A';
+    document.title = 'recall — ' + TECH.name + ' · ' + SRC_LABEL;
     const em = editMode();
 
     // rail tree
-    const groups = TECH.topics.map((t, ti) => {
+    const groups = (TECH[SRC] || []).map((t, ti) => {
       const subs = t.subtopics.map((s, si) =>
         `<a class="toc-sub" href="#${t.id}-${s.id}" data-ti="${ti}" data-idx="${si}"><span class="ts-name">${s.name}</span><span class="toc-rem"></span></a>`
       ).join('');
@@ -189,7 +197,7 @@
 
     // main sections
     let sections = '';
-    TECH.topics.forEach((t, ti) => {
+    (TECH[SRC] || []).forEach((t, ti) => {
       t.subtopics.forEach((s, si) => {
         const secId = t.id + '-' + s.id;
         const num = (ti + 1) + '.' + (si + 1);
@@ -306,7 +314,7 @@
   /* ============================================================
      Known / progress / filter  (scoped per technology)
      ============================================================ */
-  function knownKey() { return pkey('known:' + TECHID); }
+  function knownKey() { return pkey('known:' + (SRC === 'interview' ? 'iv:' : '') + TECHID); }
   function loadKnown() {
     try { knownSet = new Set(JSON.parse(localStorage.getItem(knownKey()) || '[]')); } catch (e) { knownSet = new Set(); }
     filterKnown = localStorage.getItem(pkey('filter')) === '1';
@@ -330,7 +338,7 @@
       const left = [...sec.querySelectorAll('.card')].filter(c => !knownSet.has(c.id)).length;
       rem.textContent = left ? left : '✓'; rem.classList.toggle('done', left === 0);
     });
-    if (TECH) TECH.topics.forEach(t => {
+    if (TECH) (TECH[SRC] || []).forEach(t => {
       const group = document.querySelector('.toc-group[data-topic="' + t.id + '"]'); if (!group) return;
       const left = [...document.querySelectorAll('.section[data-topic="' + t.id + '"] .card')].filter(c => !knownSet.has(c.id)).length;
       const rem = group.querySelector('.tt-rem'); if (rem) { rem.textContent = left ? left : '✓'; rem.classList.toggle('done', left === 0); }
@@ -470,6 +478,9 @@
       (t.topics || []).forEach(top => top.subtopics.forEach(s => s.cards.forEach((c, ci) => {
         out.push({ kind: 'qa', tech: t.id, techName: t.name, topic: top.name + ' › ' + s.name, label: stripTags(c.q), page: 'qa.html', anchor: top.id + '-' + s.id + '-' + (ci + 1) });
       })));
+      (t.interview || []).forEach(top => top.subtopics.forEach(s => s.cards.forEach((c, ci) => {
+        out.push({ kind: 'iv', tech: t.id, techName: t.name, topic: 'Interview · ' + top.name + ' › ' + s.name, label: stripTags(c.q), page: 'interview.html', anchor: top.id + '-' + s.id + '-' + (ci + 1) });
+      })));
       (t.book || []).forEach(b => out.push({ kind: 'book', tech: t.id, techName: t.name, topic: 'Book', label: b.title, page: 'book.html', anchor: b.id }));
     });
     return out;
@@ -494,7 +505,7 @@
     document.body.appendChild(el);
     const input = el.querySelector('#cmdkInput'), list = el.querySelector('#cmdkList');
     let data = [], results = [], sel = 0;
-    const pageTech = (PAGE === 'qa.html' || PAGE === 'book.html') ? currentTechId() : null;
+    const pageTech = (PAGE === 'qa.html' || PAGE === 'book.html' || PAGE === 'interview.html') ? currentTechId() : null;
     function render() {
       if (!results.length) { list.innerHTML = '<li class="cmdk-none">No matches</li>'; return; }
       list.innerHTML = '';
@@ -537,14 +548,14 @@
   function initTopbar() {
     const tb = document.querySelector('.topbar'); if (!tb) return;
     // tech-aware nav links
-    tb.querySelectorAll('nav a').forEach(a => { const base = a.getAttribute('href').split('?')[0]; if (base === 'qa.html' || base === 'book.html') a.setAttribute('href', base + '?tech=' + currentTechId()); });
+    tb.querySelectorAll('nav a').forEach(a => { const base = a.getAttribute('href').split('?')[0]; if (base === 'qa.html' || base === 'book.html' || base === 'interview.html') a.setAttribute('href', base + '?tech=' + currentTechId()); });
     // tech switcher
     const techs = allTechs();
     if (techs.length) {
       const wrap = document.createElement('div'); wrap.className = 'tech-switch';
       const sel = document.createElement('select'); sel.className = 'tech-select'; sel.id = 'techSelect'; sel.setAttribute('aria-label', 'Technology');
       techs.forEach(t => { const o = document.createElement('option'); o.value = t.id; o.textContent = t.name; if (t.id === currentTechId()) o.selected = true; sel.appendChild(o); });
-      sel.addEventListener('change', () => { location.href = (document.getElementById('bookApp') ? 'book.html' : 'qa.html') + '?tech=' + sel.value; });
+      sel.addEventListener('change', () => { const page = document.getElementById('bookApp') ? 'book.html' : (SRC === 'interview' ? 'interview.html' : 'qa.html'); location.href = page + '?tech=' + sel.value; });
       wrap.appendChild(sel);
       const wm = tb.querySelector('.wordmark');
       if (wm && wm.nextSibling) tb.insertBefore(wrap, wm.nextSibling); else tb.appendChild(wrap);
@@ -920,7 +931,7 @@
   }
 
   function openCardEditor(ti, si, ci) {
-    const s = TECH.topics[ti].subtopics[si];
+    const s = TECH[SRC][ti].subtopics[si];
     const ex = ci != null ? s.cards[ci] : null;
     const ov = document.createElement('div'); ov.className = 'ed-ov';
     ov.innerHTML =
@@ -953,14 +964,14 @@
       const q = qIn.value.trim(); if (!q) { qIn.focus(); return; }
       const card = { q: q, a: aIn.value }; if (longCb.checked) card.long = true;
       if (ci != null) s.cards[ci] = card; else s.cards.push(card);
-      location.hash = TECH.topics[ti].id + '-' + s.id;
+      location.hash = TECH[SRC][ti].id + '-' + s.id;
       commitTech();
     });
     setTimeout(() => qIn.focus(), 30);
   }
 
   function handleEdit(act, ti, si, ci) {
-    const T = TECH.topics, top = ti != null ? T[ti] : null, sub = (top && si != null) ? top.subtopics[si] : null;
+    const T = TECH[SRC], top = ti != null ? T[ti] : null, sub = (top && si != null) ? top.subtopics[si] : null;
     switch (act) {
       case 'add-card': openCardEditor(ti, si, null); break;
       case 'edit-card': openCardEditor(ti, si, ci); break;
@@ -1033,16 +1044,16 @@
     if (!editMode()) return;
     const tree = document.querySelector('.toc.tree');
     // topics
-    sortable(tree, '.toc-group', order => { TECH.topics = order.map(i => TECH.topics[i]); commitTech(); }, '.toc-sub');
+    sortable(tree, '.toc-group', order => { TECH[SRC] = order.map(i => TECH[SRC][i]); commitTech(); }, '.toc-sub');
     // subtopics within each topic
     if (tree) tree.querySelectorAll('.toc-group').forEach(g => {
       const ti = +g.dataset.ti;
-      sortable(g.querySelector('.toc-subs'), '.toc-sub', order => { const subs = TECH.topics[ti].subtopics; TECH.topics[ti].subtopics = order.map(i => subs[i]); commitTech(); });
+      sortable(g.querySelector('.toc-subs'), '.toc-sub', order => { const subs = TECH[SRC][ti].subtopics; TECH[SRC][ti].subtopics = order.map(i => subs[i]); commitTech(); });
     });
     // questions within each subtopic
     document.querySelectorAll('.section').forEach(sec => {
       const ti = +sec.dataset.ti, si = +sec.dataset.si;
-      sortable(sec, '.card', order => { const cards = TECH.topics[ti].subtopics[si].cards; location.hash = sec.id; TECH.topics[ti].subtopics[si].cards = order.map(i => cards[i]); commitTech(); });
+      sortable(sec, '.card', order => { const cards = TECH[SRC][ti].subtopics[si].cards; location.hash = sec.id; TECH[SRC][ti].subtopics[si].cards = order.map(i => cards[i]); commitTech(); });
     });
   }
 

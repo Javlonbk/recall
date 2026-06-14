@@ -14,6 +14,7 @@ type RawTech = {
   order?: number;
   updated?: string;
   topics?: RawTopic[];
+  interview?: RawTopic[];
   book?: RawBook[];
 };
 
@@ -24,6 +25,18 @@ function toCard(c: RawCard) {
   if (c.long) card.long = true;
   if (c.tag) card.tag = c.tag;
   return card;
+}
+
+function toTopics(topics?: RawTopic[]) {
+  return (topics ?? []).map((tp) => ({
+    id: tp.id,
+    name: tp.name,
+    subtopics: (tp.subtopics ?? []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      cards: (s.cards ?? []).map(toCard),
+    })),
+  }));
 }
 
 export function getRecallData() {
@@ -43,15 +56,8 @@ export function getRecallData() {
       name: t.name,
       blurb: t.blurb ?? '',
       ...(t.updated ? { updated: t.updated } : {}),
-      topics: (t.topics ?? []).map((tp) => ({
-        id: tp.id,
-        name: tp.name,
-        subtopics: (tp.subtopics ?? []).map((s) => ({
-          id: s.id,
-          name: s.name,
-          cards: (s.cards ?? []).map(toCard),
-        })),
-      })),
+      topics: toTopics(t.topics),
+      interview: toTopics(t.interview),
       book: (t.book ?? []).map((b) => ({ id: b.id, title: b.title, html: b.html })),
     };
   }

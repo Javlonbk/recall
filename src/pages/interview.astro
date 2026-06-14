@@ -2,13 +2,14 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="recall — Progress">
+<Base title="recall — Interview">
+<script is:inline>window.RECALL_SRC = 'interview';</script>
 <header class="topbar">
   <a class="wordmark" href="index.html">recall<span class="dot">.</span></a>
   <nav>
     <a href="qa.html">Q&amp;A</a>
-    <a href="interview.html">Interview</a>
-    <a href="progress.html" class="active">Progress</a>
+    <a href="interview.html" class="active">Interview</a>
+    <a href="progress.html">Progress</a>
   </nav>
   <span class="spacer"></span>
   <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle theme (t)">
@@ -17,5 +18,5 @@ import Base from '../layouts/Base.astro';
   </button>
 </header>
 
-<main class="prog" id="progressApp"></main>
+<div class="shell" id="qaApp"></div>
 </Base>

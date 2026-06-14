@@ -2,7 +2,7 @@
   "name": "JavaScript",
   "blurb": "The language of the web — types, scope, closures, and the event loop.",
   "order": 0,
-  "updated": "2026-06-13",
+  "updated": "2026-06-14",
   "topics": [
     {
       "id": "sample",
@@ -1694,63 +1694,51 @@
           "cards": [
             {
               "question": "What is a closure?",
-              "answer": "<p class=\"answer-line\">A closure is a function that <b>remembers its outer variables and can access them</b> — it carries its birthplace scope with it.</p><p>It's not a special kind of function you opt into; it's just what happens when a function keeps access to where it was defined.</p>",
+              "answer": "<p class=\"answer-line\">A closure is a function that <b>remembers its outer variables and can access them</b> — it carries its birthplace scope with it.</p><p>It isn't a special type of function you turn on — it happens automatically whenever a function uses a variable from outside itself.</p><p>It reads those variables from where it was <b>created</b>, not from where it's called.</p>\n",
               "long": false,
               "tag": ""
             },
             {
               "question": "Are all JavaScript functions closures?",
-              "answer": "<p class=\"answer-line\">Yes — all functions are naturally closures, with one exception: functions made with <code>new Function</code>.</p><p>A function automatically remembers where it was created via a hidden <code>[[Environment]]</code> property, and its code can access the variables of that place.</p>",
+              "answer": "<p class=\"answer-line\">Yes — all functions are naturally closures, with one exception: functions made with <code>new Function</code>.</p>",
               "long": false,
               "tag": ""
             },
             {
-              "question": "For a closure, does where a function is defined or where it's called matter?",
-              "answer": "<p class=\"answer-line\">Where it was <b>defined</b>, not where it is called. A function closes over the scope of its definition, and that access survives even after the outer function has returned.</p>",
+              "question": "How does a closure keep a value between calls",
+              "answer": "<p class=\"answer-line\">The returned inner function is the <b>closure</b> — it holds a reference to the outer variable, so the variable stays alive and each call reads and updates the same one.</p><pre><code>function makeCounter() {\n  let count = 0;\n  return function () { return count++; };  // ← this inner function is the closure\n}\n\nconst a = makeCounter();\na(); // 0  — same count, remembered\na(); // 1  — and updated on the next call</code></pre>\n",
               "long": false,
               "tag": ""
             },
             {
-              "question": "Show a counter factory closure.",
-              "answer": "<p class=\"answer-line\"><code>makeCounter()</code> declares <code>count</code> and returns an inner function that reads and increments it — the inner function still works after <code>makeCounter()</code> has finished.</p><pre><code>function makeCounter() {\n  let count = 0;\n  return function() {\n    return count++;\n  };\n}\n\nlet counter = makeCounter();\ncounter(); // 0\ncounter(); // 1\ncounter(); // 2</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Do two counters from the same factory share state?",
-              "answer": "<p class=\"answer-line\">No. Each call to <code>makeCounter()</code> makes a fresh, independent <code>count</code>.</p><pre><code>let a = makeCounter();\nlet b = makeCounter();\na(); // 0\na(); // 1\nb(); // 0  -- b has its own count</code></pre>",
+              "question": "If you make two counters, do they share the same count?",
+              "answer": "<p class=\"answer-line\">No — each call to <code>makeCounter()</code> creates a fresh, independent <code>count</code>.</p><pre><code>const a = makeCounter();\nconst b = makeCounter();\n\na(); // 0\na(); // 1   — a has its own count\nb(); // 0   — b starts fresh, untouched by a</code></pre>\n",
               "long": false,
               "tag": ""
             },
             {
               "question": "Why does a closure keep working after the outer function returns?",
-              "answer": "<p class=\"answer-line\">Because every function stores a hidden <code>[[Environment]]</code> reference to the Lexical Environment where it was created. Through that link the inner function can still reach the outer variables after the outer function has returned.</p>",
+              "answer": "<p class=\"answer-line\">When a function returns, its stack frame is removed and its variables are normally garbage-collected — nothing references them. A closure is the exception: the returned inner function keeps a <b>hidden link</b> to those variables, so they stay in memory and stay usable.</p><pre><code>function makeCounter() {\n  let count = 0;          // closure uses it  → kept alive\n  let label = \"scratch\";  // closure ignores it → collected after return\n  return function () { return count++; };  // references count only\n}\n\nconst a = makeCounter();  // makeCounter returned → stack frame gone\n                          // label: nothing references it → garbage-collected\n                          // count: closure still holds it → survives\na(); // 0\na(); // 1</code></pre>\n",
               "long": false,
               "tag": ""
             },
             {
               "question": "What is a Lexical Environment?",
-              "answer": "<p class=\"answer-line\">The internal object that holds a scope's variables. When a function is created, its <code>[[Environment]]</code> is set to the environment of that place — a hidden link to where it was written.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "If the outer call's stack frame is gone, how does variable lookup still find the variable?",
-              "answer": "<p class=\"answer-line\">Variable lookup doesn't use the stack. When the inner function reads a variable, the search follows its <code>[[Environment]]</code> link and finds the variable in the captured environment.</p><pre><code>function makeCounter() {\n  let count = 0;\n  return function() { return count++; };\n}\nlet counter = makeCounter(); // makeCounter has returned...\ncounter();                   // ...but count is found via [[Environment]]</code></pre>",
+              "answer": "<p class=\"answer-line\">A Lexical Environment is the internal \"box\" that holds the variables of one scope — each function call gets its own.</p><p>Every function records a hidden link, called <code>[[Environment]]</code>, to the box where it was created. Every function uses these boxes to look up variables — a closure is special only because it keeps an outer box alive after the outer function has returned.</p><pre><code>  function                       Lexical Environment (box)\n  ┌─────────────────┐            ┌──────────────┐\n  │ [[Environment]] ─┼──────────►│  count: 0    │\n  └─────────────────┘            └──────────────┘</code></pre>\n",
               "long": false,
               "tag": ""
             },
             {
               "question": "Does a closure copy the outer variables?",
-              "answer": "<p class=\"answer-line\">No. It works by keeping a <b>link</b> to the environment and resolving variables through it at call time — nothing is copied.</p>",
+              "answer": "<p class=\"answer-line\">No — it keeps its [[Environment]] link and reads the variable through it at call time; nothing is copied.</p>",
               "long": false,
               "tag": ""
             },
             {
               "question": "Why can't a function made with new Function see outer variables?",
-              "answer": "<p class=\"answer-line\">Because its <code>[[Environment]]</code> is set to the <b>global</b> Lexical Environment, not to the place where it was created. It only sees global variables.</p>\n<p>This is the one exception to “all functions are closures”. A regular function records its birthplace in <code>[[Environment]]</code>; a function built with <code>new Function</code> records the global environment instead:</p>\n<pre><code>function getFunc() {\n  let value = \"test\";\n  let func = new Function('return value;');\n  return func;\n}\n\ngetFunc()(); // ReferenceError: value is not defined</code></pre>\n<p>The restriction is deliberate. <code>new Function</code> builds a function from a string, often at runtime, when the surrounding code is long gone — and minifiers rename local variables, so a string referring to them by name would break anyway. If such a function needs outside data, pass it in as arguments.</p>",
+              "answer": "<p class=\"answer-line\">Because its <code>[[Environment]]</code> is set to the <b>global</b> Lexical Environment, not to the place where it was created. It only sees global variables.</p>\n<p>This is the one exception to “all functions are closures”. A regular function records its birthplace in <code>[[Environment]]</code>; a function built with <code>new Function</code> records the global environment instead:</p>\n<pre><code>function getFunc() {\n  let value = \"test\";\n  let func = new Function('return value;');\n  return func;\n}\n\ngetFunc()(); // ReferenceError: value is not defined</code></pre>\n<br>\n<p>The restriction is deliberate. <code>new Function</code> builds a function from a string, often at runtime, when the surrounding code is long gone — and minifiers (tools like Terser that shrink code by renaming variables) rename local variables, so a string referring to them by name would break anyway. If such a function needs outside data, pass it in as arguments.</p>",
               "long": false,
-              "tag": "trap"
+              "tag": ""
             }
           ]
         },
@@ -1760,43 +1748,19 @@
           "cards": [
             {
               "question": "Does a closure capture the value or the variable?",
-              "answer": "<p class=\"answer-line\">The <b>variable</b> (its binding), not a snapshot of the value at the moment the closure was created.</p><p>When the function runs, it reads the variable's <b>current</b> value from the lexical environment, so changes made after creation are visible.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "If you mutate a variable after creating a closure, what does the closure see?",
-              "answer": "<p class=\"answer-line\">The <b>new</b> value — the closure re-reads the variable when called, not when created.</p><pre><code>function makeGreeter() {\n  let name = \"John\";\n  function greet() { return \"Hi, \" + name; }\n  name = \"Pete\"; // mutate after greet was created\n  return greet;\n}\nmakeGreeter()(); // \"Hi, Pete\"  — not \"John\"</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Does a closure re-read its variable on every call?",
-              "answer": "<p class=\"answer-line\">Yes — so a mutation between calls changes the next result.</p><pre><code>let count = 0;\nconst read = () => count;\nread(); // 0\ncount = 5;\nread(); // 5\ncount++;\nread(); // 6</code></pre>",
+              "answer": "<p class=\"answer-line\">The <b>variable</b> (its binding), not a value. The closure reads the variable's <b>current</b> value every time it's called, so a change made after creation is visible.</p><pre><code>let name = \"John\";\nfunction greet() { return \"Hi, \" + name; }\n\nname = \"Pete\";   // changed after greet was created\ngreet();         // \"Hi, Pete\" — not \"John\"</code></pre>\n",
               "long": false,
               "tag": ""
             },
             {
               "question": "How do you make a closure freeze a snapshot of a value?",
-              "answer": "<p class=\"answer-line\">Copy the value into its own variable at creation time — a parameter or a fresh <code>let</code>. The closure then captures <b>that</b> binding instead of the changing one.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "When do multiple closures share one binding vs. get a fresh one?",
-              "answer": "<p class=\"answer-line\">Closures from the <b>same</b> outer call share one binding; closures from <b>different</b> calls of the outer function get separate, fresh bindings.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Do inner functions from the same call get private copies of an outer variable?",
-              "answer": "<p class=\"answer-line\">No — they all point at the same slot, so a write through one is seen by all.</p><pre><code>function makePair() {\n  let x = 0;\n  const get = () => x;\n  const inc = () => { x++; };\n  return { get, inc };\n}\nconst p = makePair();\np.get(); // 0\np.inc();\np.get(); // 1  — one shared x</code></pre>",
+              "answer": "<p class=\"answer-line\">Copy the value into its own variable at creation time — then the closure captures that copy instead of the changing one.</p><pre><code>let x = 1;\nconst frozen = x;          // copy the current value\nconst read = () => frozen; // closure tracks frozen, not x\n\nx = 99;                    // x changes, frozen doesn't\nread(); // 1  — snapshot frozen</code></pre>\n",
               "long": false,
               "tag": ""
             },
             {
               "question": "Why does each call to the outer function produce independent closure state?",
-              "answer": "<p class=\"answer-line\">Because each <b>call</b> creates a fresh Lexical Environment, so its inner functions close over a brand-new variable — that's why two counters from one factory are independent.</p>",
+              "answer": "<p class=\"answer-line\">Because a function's Lexical Environment (its box) is created fresh on <b>each call</b> — not at definition. Every call's inner functions close over a brand-new variable, so their state is independent.</p><pre><code>function makeCounter() { let count = 0; return () => count++; }\n\nmakeCounter(); // new box { count: 0 }\nmakeCounter(); // another new box { count: 0 } — unrelated</code></pre>\n",
               "long": false,
               "tag": ""
             }
@@ -1808,43 +1772,25 @@
           "cards": [
             {
               "question": "When is a closed-over variable garbage collected?",
-              "answer": "<p class=\"answer-line\">When every function that closed over it becomes unreachable. A lexical environment stays alive as long as at least one reachable closure references it.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Normally a call's local variables die at return — why can a closure keep them alive?",
-              "answer": "<p class=\"answer-line\">If a function created inside the call survives the return (e.g. you return it), it keeps a hidden reference to that environment, so the environment and its variables live on.</p><pre><code>function makeCounter() {\n  let count = 0;\n  return function() { return count++; };\n}\nlet counter = makeCounter();\ncounter(); // 0\ncounter(); // 1  -- count still alive, held by counter</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How do you make a closed-over variable collectable again?",
-              "answer": "<p class=\"answer-line\">Drop the last reference to the closure — then the environment (with its variables) becomes eligible for GC like any unreachable object.</p><pre><code>counter = null;\n// nothing references count's environment anymore\n// -> eligible for garbage collection</code></pre>",
+              "answer": "<p class=\"answer-line\">A closed-over variable stays alive as long as a reachable closure still references it. It becomes collectable when you drop the <b>last</b> reference to that closure.</p><pre><code>let counter = makeCounter(); // count kept alive by counter\ncounter = null;              // last reference gone → count can be collected</code></pre>",
               "long": false,
               "tag": ""
             },
             {
               "question": "How can closures cause memory leaks?",
-              "answer": "<p class=\"answer-line\">A closure keeps its <b>entire</b> lexical environment alive — including large captured objects it never uses. If the closure lives somewhere long-lived (listener, cache, timer), that memory is never released.</p><pre><code>function makeHandler() {\n  const bigData = new Array(1_000_000).fill('x');\n  return function onClick() {\n    return 'clicked'; // never touches bigData\n  };\n}\nlet handler = makeHandler(); // bigData retained while handler is reachable</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Where do closure leaks actually happen?",
-              "answer": "<p class=\"answer-line\">When the closure is parked somewhere persistent so it never becomes unreachable — registered as an event listener, stored in a cache, or used in <code>setInterval</code>.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Don't engines drop unused captured variables?",
-              "answer": "<p class=\"answer-line\">V8 optimizes by retaining only the variables a closure actually references, so an obviously-unused capture may be dropped — but it's an optimization, not a guarantee. Don't rely on it across engines (and in V8 those variables become unavailable in debugging).</p>",
+              "answer": "<p class=\"answer-line\">A long-lived closure keeps its <b>whole</b> environment alive — including big objects it captured but never uses. If it's parked somewhere persistent (event listener, cache, <code>setInterval</code>), that memory is never freed.</p><pre><code>function makeHandler() {\n  const bigData = new Array(1_000_000).fill('x');\n  return function onClick() {\n    return 'clicked'; // never touches bigData\n  };\n}\nlet handler = makeHandler(); // bigData retained while handler is reachable</code></pre>",
               "long": false,
               "tag": ""
             },
             {
               "question": "How do you fix a closure memory leak?",
               "answer": "<p class=\"answer-line\">Remove the reference that keeps the closure alive.</p><pre><code>el.removeEventListener('click', handler); // remove listeners\nclearInterval(id);                        // clear timers\nhandler = null;                           // null references\n// now the closure and its environment can be collected</code></pre>",
+              "long": false,
+              "tag": ""
+            },
+            {
+              "question": "Don't engines drop unused captured variables?",
+              "answer": "<p class=\"answer-line\">V8 retains only the variables a closure actually references, so an obviously-unused capture may be dropped — but it's an <b>optimization, not a guarantee</b>. Don't rely on it across engines (and in V8 those variables become unavailable while debugging).</p>",
               "long": false,
               "tag": ""
             }
@@ -1867,38 +1813,14 @@
               "tag": ""
             },
             {
-              "question": "How do closures relate to partial application and currying?",
-              "answer": "<p class=\"answer-line\">Fixing some arguments now and supplying the rest later is the function-factory idea generalised — the closure remembers the fixed arguments. (Mechanics covered in the Advanced Functions topic.)</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How do closures let a callback keep state between invocations?",
-              "answer": "<p class=\"answer-line\">The callback closes over a variable that outlives each call, carrying private state across invocations — no global needed.</p><pre><code>function makeCounter() {\n  let count = 0;\n  return function () { return count++; };\n}\nconst next = makeCounter();\nnext(); // 0\nnext(); // 1\n// attach next as a click handler: each click bumps the same count</code></pre>",
+              "question": "How do closures give you private state?",
+              "answer": "<p class=\"answer-line\">Variables declared in an outer function are unreachable from outside — only the functions it returns can read or write them, making them effectively private. This was the pre-class way to get private fields, and is the basis of the module pattern.</p><pre><code>function makeCounter() {\n  let count = 0; // private\n  return {\n    increment() { count++; },\n    decrement() { count--; },\n    value() { return count; },\n  };\n}\nconst counter = makeCounter();\ncounter.increment();\ncounter.increment();\ncounter.value(); // 2\ncounter.count;   // undefined — not a property</code></pre>",
               "long": false,
               "tag": ""
             },
             {
               "question": "How do closures enable memoization?",
-              "answer": "<p class=\"answer-line\">A wrapper function closes over a cache object and returns stored results instead of recomputing them.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How do closures give you private state?",
-              "answer": "<p class=\"answer-line\">Variables declared in an outer function are unreachable from outside — only the functions returned from it can read or write them, making those variables effectively private.</p><p>This was the pre-class way to get private fields, and is the basis of the module pattern.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Show closures providing private state with shared accessor methods.",
-              "answer": "<pre><code>function makeCounter() {\n  let count = 0; // private\n  return {\n    increment() { count++; },\n    decrement() { count--; },\n    value() { return count; },\n  };\n}\nconst counter = makeCounter();\ncounter.increment();\ncounter.increment();\ncounter.decrement();\ncounter.value(); // 1\ncounter.count;   // undefined - not a property</code></pre><p class=\"answer-line\">The methods share one hidden <code>count</code>; there's no <code>counter.count</code> property to read or assign.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Do separate instances built from a closure-based factory share private state?",
-              "answer": "<p class=\"answer-line\">No — each call builds a fresh scope, so separate instances keep separate state.</p><pre><code>const a = makeCounter();\nconst b = makeCounter();\na.increment();\na.value(); // 1\nb.value(); // 0</code></pre>",
+              "answer": "<p class=\"answer-line\">A wrapper function closes over a cache and returns stored results instead of recomputing them.</p><pre><code>function memoize(fn) {\n  const cache = {};                 // lives in the closure\n  return (n) => (n in cache ? cache[n] : (cache[n] = fn(n)));\n}</code></pre>",
               "long": false,
               "tag": ""
             }
@@ -1910,49 +1832,13 @@
           "cards": [
             {
               "question": "Why does a for loop with var and setTimeout print the same number?",
-              "answer": "<p class=\"answer-line\"><code>var</code> creates <b>one</b> binding shared by every iteration, and the deferred callbacks all run after the loop ends — by then that single <code>i</code> holds its final value.</p><pre><code>for (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i));\n}\n// 3\n// 3\n// 3</code></pre>",
+              "answer": "<p class=\"answer-line\"><code>var</code> has one function-scoped binding shared by every iteration, and the deferred callbacks all run <b>after</b> the loop ends — by then that single <code>i</code> holds its final value, <code>3</code>. The closures captured the variable, not a per-iteration snapshot.</p><pre><code>for (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i));\n}\n// 3\n// 3\n// 3</code></pre><p>Not specific to <code>setTimeout</code> — any deferred call (promise, event) behaves the same.</p>",
               "long": false,
               "tag": ""
             },
             {
-              "question": "In the var-in-loop pitfall, do the closures capture the value or the variable?",
-              "answer": "<p class=\"answer-line\">The <b>variable</b>. A <code>var</code> in a loop is function-scoped — there's exactly one <code>i</code>, and every callback closes over it, not a snapshot of its per-iteration value.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why is the final value 3 and not 2 in the var-in-loop example?",
-              "answer": "<p class=\"answer-line\">The callbacks fire after the loop completes. The loop runs <code>i</code> up to <code>3</code> — the value that fails <code>i < 3</code> and stops it — so each deferred callback reads the live <code>i</code>, now <code>3</code>.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Is the var-in-loop pitfall specific to setTimeout?",
-              "answer": "<p class=\"answer-line\">No — it happens with any deferred call, not just timers. What matters is the closure reading a shared variable after the loop has finished.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What's the core idea behind every fix for the var-in-loop pitfall?",
-              "answer": "<p class=\"answer-line\">Give each iteration its <b>own</b> variable to close over, so each closure captures a distinct one. The three ways: <code>let</code>, a per-iteration IIFE, or a function factory. Reach for <code>let</code> unless constrained to old code.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How does let fix the var-in-loop pitfall?",
-              "answer": "<p class=\"answer-line\">A <code>let</code> in a <code>for</code> header gets a <b>fresh binding each iteration</b>, so each callback closes over a different variable.</p><pre><code>for (let i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i));\n}\n// 0\n// 1\n// 2</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How did you fix the var-in-loop pitfall before ES6 (IIFE)?",
-              "answer": "<p class=\"answer-line\">Wrap the body in an immediately-invoked function and pass <code>i</code> in — the parameter is a new local variable each call, holding a copy of <code>i</code>'s current value.</p><pre><code>for (var i = 0; i < 3; i++) {\n  (function (j) {\n    setTimeout(() => console.log(j));\n  })(i);\n}\n// 0\n// 1\n// 2</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How does a function factory fix the var-in-loop pitfall?",
-              "answer": "<p class=\"answer-line\">A named function takes the value and returns a closure over it; calling it per iteration captures that iteration's value.</p><pre><code>function makeLogger(value) {\n  return () => console.log(value);\n}\nfor (var i = 0; i < 3; i++) {\n  setTimeout(makeLogger(i));\n}\n// 0\n// 1\n// 2</code></pre>",
+              "question": "How do you fix the var-in-loop pitfall?",
+              "answer": "<p class=\"answer-line\">Give each iteration its <b>own</b> variable to close over. Three ways — reach for <code>let</code> unless stuck in old code:</p><pre><code>// 1. let — a fresh binding per iteration\nfor (let i = 0; i < 3; i++) setTimeout(() => console.log(i)); // 0 1 2\n\n// 2. IIFE — pass i in as a new local each iteration\nfor (var i = 0; i < 3; i++) ((j) => setTimeout(() => console.log(j)))(i); // 0 1 2\n\n// 3. factory — return a closure over the value\nfunction logger(v) { return () => console.log(v); }\nfor (var i = 0; i < 3; i++) setTimeout(logger(i)); // 0 1 2</code></pre>",
               "long": false,
               "tag": ""
             }
@@ -2930,9 +2816,9 @@
             },
             {
               "question": "Can you reuse a native method on an unrelated object?",
+              "answer": "<p class=\"answer-line\">Yes. Many built-in methods are <b>generic</b> — they never check the type of <code>this</code>, only its shape. <code>Array.prototype.join</code> just walks indices <code>0..length-1</code>, so any object with numeric keys and a <code>length</code> (a function's <code>arguments</code>, a DOM <code>NodeList</code>) satisfies it, even though it isn't an array.</p>\n<p>That generality is what makes the methods reusable. The pattern of actually reusing them on other objects — method borrowing — is covered in <b>Advanced Functions</b>.</p>",
               "long": false,
-              "tag": "",
-              "answer": "<p class=\"answer-line\">Yes. Many built-in methods are <b>generic</b> — they never check the type of <code>this</code>, only its shape. <code>Array.prototype.join</code> just walks indices <code>0..length-1</code>, so any object with numeric keys and a <code>length</code> (a function's <code>arguments</code>, a DOM <code>NodeList</code>) satisfies it, even though it isn't an array.</p>\n<p>That generality is what makes the methods reusable. The pattern of actually reusing them on other objects — method borrowing — is covered in <b>Advanced Functions</b>.</p>"
+              "tag": ""
             },
             {
               "question": "Should you modify native prototypes (monkey-patching)?",
