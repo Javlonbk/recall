@@ -121,19 +121,13 @@
               "tag": ""
             },
             {
-              "question": "What are the three ways to declare a variable in JavaScript?",
+              "question": "What are the three ways to declare a variable?",
               "answer": "<p class=\"answer-line\">With one of three keywords: <code>const</code>, <code>let</code>, or the older <code>var</code>.</p>\n<pre><code>const pi = 3.14;\nlet count = 0;\nvar old = true;   // the pre-2015 form</code></pre>\n<p>Today <code>let</code> and <code>const</code> are used for everything; <code>var</code> is the older form, kept for backward compatibility. The keywords differ in where the variable is visible and whether it can change — the next cards cover that.</p>",
               "long": false,
               "tag": ""
             },
             {
-              "question": "What's the difference between block scope and function scope?",
-              "answer": "<p class=\"answer-line\">Scope is the region of code where a variable is visible. <code>let</code> and <code>const</code> are block-scoped — they exist only inside the <code>{ }</code> block where they are declared. <code>var</code> is function-scoped — it ignores blocks and exists throughout the whole function.</p>\n<pre><code>function f() {\n  if (true) {\n    var a = 1;\n    let b = 2;\n  }\n  console.log(a); // 1 — var is visible here\n  console.log(b); // ReferenceError — b only existed in the block\n}</code></pre>\n<p>Because a <code>var</code> is not limited to its block, it stays visible after the block ends — a common source of bugs.</p>",
-              "long": false,
-              "tag": "interview"
-            },
-            {
-              "question": "What does each keyword allow for reassignment, redeclaration, and initialization?",
+              "question": "const, let, var — which can be reassigned or redeclared?",
               "answer": "<p class=\"answer-line\"><code>let</code> can be reassigned and may be declared without a value. <code>const</code> must be given a value when declared and cannot be reassigned afterward. Neither can be declared twice in the same scope; <code>var</code> can.</p>\n<pre><code>const a;     // SyntaxError — const needs a value\nlet b;       // ok — b is undefined\n\nlet x = 1;\nx = 2;       // ok — reassigned\nlet x = 3;   // SyntaxError — already declared\n\nvar y = 1;\nvar y = 2;   // ok — var allows redeclaration</code></pre>\n<p>Redeclaring the same name is usually a mistake, so <code>let</code> and <code>const</code> report it as an error.</p>",
               "long": false,
               "tag": ""
@@ -175,7 +169,7 @@
               "tag": ""
             },
             {
-              "question": "How do you produce a value where a statement like if won't work?",
+              "question": "How do you choose between two values inline, without an if?",
               "answer": "<p class=\"answer-line\">Statements such as <code>if</code> and <code>for</code> do not produce values, so they cannot be used where a value is expected. Use an expression form instead: the ternary <code>? :</code>, or <code>&&</code> / <code>||</code>.</p>\n<pre><code>const max = a &gt; b ? a : b;   // ok — ternary is an expression\nconst max = if (a &gt; b) a;    // SyntaxError — if is a statement</code></pre>",
               "long": false,
               "tag": ""
@@ -217,13 +211,13 @@
           "name": "Operators & precedence",
           "cards": [
             {
-              "question": "What are operands, and what are unary, binary, and ternary operators?",
+              "question": "What are unary, binary, and ternary operators?",
               "answer": "<p class=\"answer-line\">An operator acts on values called <b>operands</b>. Operators are grouped by how many operands they take: <b>unary</b> (one), <b>binary</b> (two), and the single <b>ternary</b> (three).</p>\n<pre><code>-x          // unary minus (one operand)\na + b       // binary plus (two operands)\na ? b : c   // the ternary operator (three operands)</code></pre>",
               "long": false,
               "tag": ""
             },
             {
-              "question": "What do the arithmetic operators do, and how does + behave with strings?",
+              "question": "What are the arithmetic operators, and how does + treat strings?",
               "answer": "<p class=\"answer-line\">The arithmetic operators are <code>+ - * /</code> plus <code>%</code> (remainder) and <code>**</code> (exponentiation). They all convert their operands to numbers — except <code>+</code>, which concatenates if either operand is a string.</p>\n<pre><code>2 ** 3     // 8\n10 % 3     // 1\n'1' + 2    // '12'  — string concatenation\n'5' - 2    // 3     — converted to numbers</code></pre>",
               "long": false,
               "tag": ""
@@ -421,14 +415,8 @@
               "tag": ""
             },
             {
-              "question": "Why is typeof the key separator between undeclared and TDZ?",
-              "answer": "<p class=\"answer-line\"><code>typeof</code> shields you from <b>undeclared</b> identifiers but <b>not</b> from the TDZ. So a <code>ReferenceError</code> from <code>typeof</code> tells you the variable <i>is</i> declared with <code>let</code>/<code>const</code> further down — not that it's missing.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "What's the semantic difference between null and undefined?",
-              "answer": "<p class=\"answer-line\"><code>undefined</code> is what the <b>engine</b> assigns when something has no value yet; <code>null</code> is what the <b>programmer</b> assigns to say \"intentionally empty\".</p>",
+              "answer": "<p class=\"answer-line\"><code>undefined</code> is what the <b>engine</b> assigns when something has no value yet; <code>null</code> is what the <b>programmer</b> assigns to say \"intentionally empty\".</p>\n<p><b>Convention:</b> never assign <code>undefined</code> yourself — reserve <code>null</code> for deliberate emptiness, so the two stay distinct.</p>",
               "long": false,
               "tag": ""
             },
@@ -441,12 +429,6 @@
             {
               "question": "Are null and undefined equal?",
               "answer": "<p class=\"answer-line\">Loosely equal, but not strictly equal:</p>\n<pre><code>null == undefined   // true\nnull === undefined  // false</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What's the convention for using null vs undefined?",
-              "answer": "<p class=\"answer-line\"><b>Never assign <code>undefined</code> manually; reserve <code>null</code> for intentional emptiness.</b></p>\n<p>Then the two stay semantically distinct: <code>undefined</code> means \"the engine never got a value here\", <code>null</code> means \"someone decided this is empty\".</p>",
               "long": false,
               "tag": ""
             }
@@ -565,20 +547,8 @@
               "tag": "modern"
             },
             {
-              "question": "Why does new Symbol() throw?",
-              "answer": "<p class=\"answer-line\"><code>Symbol</code> and <code>BigInt</code> are not constructors — call them as plain functions. Using <code>new</code> throws a <code>TypeError</code>.</p>\n<pre><code>new Symbol();    // TypeError: Symbol is not a constructor\nnew BigInt(1);   // TypeError: BigInt is not a constructor\n\nSymbol(\"id\");    // works — a symbol\nBigInt(42);      // works — 42n</code></pre>\n<p><code>symbol</code> and <code>bigint</code> arrived after the wrapper-object mistake of <code>new String</code>/<code>new Number</code>/<code>new Boolean</code> (see the Wrapper objects cards) was well understood, so they forbid <code>new</code> outright — you cannot create a symbol or bigint wrapper by accident.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "What does Symbol.for(key) do?",
-              "answer": "<p class=\"answer-line\">Usually all symbols are unique, even with the same name. <code>Symbol.for(key)</code> is the exception: it returns the <b>same</b> symbol for the same key from anywhere in the app via the <b>global symbol registry</b>, creating it on first request.</p>\n<pre><code>let id = Symbol.for(\"id\");      // created in the registry\nlet idAgain = Symbol.for(\"id\"); // read back — anywhere, even another file\n\nid === idAgain; // true — same symbol, same key</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "When should you use Symbol.for instead of Symbol()?",
-              "answer": "<p class=\"answer-line\">When a symbol must be <b>shared by name</b> — different parts of a codebase (or different libraries) agreeing on one property key without passing the symbol object around.</p>\n<p>Rule of thumb: <code>Symbol()</code> for keys you control and pass by reference; <code>Symbol.for()</code> when independent code must arrive at the same symbol by agreement on a string name.</p>",
+              "answer": "<p class=\"answer-line\">Usually all symbols are unique, even with the same name. <code>Symbol.for(key)</code> is the exception: it returns the <b>same</b> symbol for the same key from anywhere in the app via the <b>global symbol registry</b>, creating it on first request.</p>\n<pre><code>let id = Symbol.for(\"id\");      // created in the registry\nlet idAgain = Symbol.for(\"id\"); // read back — anywhere, even another file\n\nid === idAgain; // true — same symbol, same key</code></pre>\n<p>Use it when a symbol must be <b>shared by name</b> — independent code agreeing on one property key without passing the symbol around. Use plain <code>Symbol()</code> for keys you control and pass by reference.</p>",
               "long": false,
               "tag": ""
             },
@@ -607,26 +577,20 @@
               "tag": ""
             },
             {
+              "question": "What are the two rules that decide every + expression?",
+              "answer": "<p class=\"answer-line\">After <code>ToPrimitive</code>: if either operand is a string, <code>+</code> <b>concatenates</b>; otherwise both go through <code>ToNumber</code>. Every other arithmetic operator (<code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>, <code>**</code>) always forces numbers.</p>\n<pre><code>\"5\" + 1;   // \"51\" — string operand → concat\n\"5\" - 1;   // 4    — minus always forces ToNumber\n1 + null;  // 1    — no string → ToNumber: null → 0</code></pre>\n<p>That single asymmetry — <code>+</code> being the only operator that can produce a string — explains the whole family. Don't memorize outputs; <b>walk the algorithm</b> and the answer is forced.</p>",
+              "long": false,
+              "tag": ""
+            },
+            {
               "question": "What are the four abstract operations?",
               "answer": "<p class=\"answer-line\">The spec defines four conversion algorithms: <code>ToPrimitive</code>, <code>ToString</code>, <code>ToNumber</code>, and <code>ToBoolean</code>. Every coercion in the language eventually calls one of them.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Operation</th><th>Input</th><th>Output</th><th>Triggered by</th></tr></thead>\n<tbody>\n<tr><td class=\"mono\">ToPrimitive(input, hint)</td><td>object</td><td>primitive</td><td>the other three when given an object; <code>+</code>, <code>==</code> on objects</td></tr>\n<tr><td class=\"mono\">ToString(input)</td><td>any</td><td>string</td><td><code>String(x)</code>, template literals <code>`${x}`</code>, <code>+</code> when an operand is a string</td></tr>\n<tr><td class=\"mono\">ToNumber(input)</td><td>any</td><td>number</td><td><code>Number(x)</code>, <code>+x</code>, <code>-x</code>, <code>*</code>, <code>/</code>, <code>%</code>, <code>**</code>; <code>&lt;</code>, <code>&gt;</code> — unless both operands are strings, which compare character by character</td></tr>\n<tr><td class=\"mono\">ToBoolean(input)</td><td>any</td><td>boolean</td><td><code>if</code>, <code>while</code>, <code>&amp;&amp;</code>, <code>||</code>, <code>!</code>, ternary, <code>Boolean(x)</code></td></tr>\n</tbody>\n</table></div>\n<p>They are <b>abstract</b>: you cannot call them directly. They run inside operators and built-ins. Knowing which operator triggers which operation is the whole game.</p>",
               "long": false,
               "tag": ""
             },
             {
-              "question": "What are abstract operations, built-in functions, and instance methods?",
-              "answer": "<p class=\"answer-line\">Three layers of how conversion works: <b>abstract operations</b> are spec-only recipes, <b>built-in functions</b> are callable wrappers around them, <b>instance methods</b> are object methods the recipes call.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Layer</th><th>Examples</th><th>Callable?</th><th>Lives in</th></tr></thead>\n<tbody>\n<tr><td><b>Abstract ops</b> (capital <code>T</code>)</td><td class=\"mono\">ToString, ToNumber, ToBoolean, ToPrimitive</td><td><b>No</b> — internal to engine</td><td>ECMAScript spec only</td></tr>\n<tr><td><b>Built-in functions</b></td><td class=\"mono\">String(x), Number(x), Boolean(x)</td><td><b>Yes</b></td><td>Global fns; without <code>new</code> they run the matching abstract op</td></tr>\n<tr><td><b>Instance methods</b> (lowercase <code>t</code>)</td><td class=\"mono\">x.toString(), x.valueOf()</td><td><b>Yes</b></td><td>On objects, from <code>Object.prototype</code> or overridden</td></tr>\n</tbody>\n</table></div>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What is the layer chain when you write String(obj)?",
-              "answer": "<p class=\"answer-line\">The built-in invokes the abstract op, which delegates to <code>ToPrimitive</code>, which finally calls an instance method on the object.</p>\n<pre><code>You write:    String(obj)\n                ↓ (built-in invokes the abstract op)\nEngine runs:  ToString(obj)              ← abstract op\n                ↓ (obj is an object, hands the job over)\nEngine runs:  ToPrimitive(obj, \"string\") ← another abstract op\n                ↓ (this one calls instance methods)\nEngine calls: obj.toString()             ← actual method on the object</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why do ToString and .toString() share a name but differ?",
-              "answer": "<p class=\"answer-line\">They live at different layers: <code>ToString</code> (capital) is the spec algorithm; <code>.toString()</code> (lowercase) is one of the methods that algorithm calls internally. Same for <code>ToPrimitive</code> vs <code>.valueOf()</code>.</p>\n<p>You never type <code>ToString</code> in code — it is the name the spec and MDN use for what the engine does. Code calls <code>String(x)</code>; the spec calls it <code>ToString</code>.</p>",
+              "question": "ToString vs String() vs .toString() — what's the difference?",
+              "answer": "<p class=\"answer-line\">Three layers. <b>Capital</b> <code>ToString</code>/<code>ToNumber</code>/<code>ToPrimitive</code> are <b>spec-only algorithms</b> — you never type them; the engine runs them. <code>String(x)</code>/<code>Number(x)</code> are the <b>callable built-ins</b> that trigger the matching algorithm. <code>x.toString()</code>/<code>x.valueOf()</code> are the <b>instance methods</b> the algorithm calls on objects.</p>\n<pre><code>You write:    String(obj)\n                ↓ (built-in triggers the spec algorithm)\nEngine runs:  ToString(obj)              ← spec algorithm\n                ↓ (obj is an object, hands the job over)\nEngine runs:  ToPrimitive(obj, \"string\") ← another algorithm\n                ↓ (this one calls instance methods)\nEngine calls: obj.toString()             ← actual method on the object</code></pre>",
               "long": false,
               "tag": ""
             },
@@ -637,32 +601,8 @@
               "tag": ""
             },
             {
-              "question": "What is the ToPrimitive algorithm step by step?",
-              "answer": "<p class=\"answer-line\"><b>1.</b> If the object has <code>Symbol.toPrimitive</code>, call it with the hint; its result (must be a primitive) wins.</p>\n<p><b>2.</b> Otherwise pick method order by hint: <code>\"string\"</code> tries <code>toString()</code> then <code>valueOf()</code>; <code>\"number\"</code>/<code>\"default\"</code> try <code>valueOf()</code> then <code>toString()</code>.</p>\n<p><b>3.</b> The first method returning a primitive wins; if it returns an object, try the second.</p>\n<p><b>4.</b> If neither returns a primitive, throw <code>TypeError</code>.</p>\n<pre><code>const obj = {\n  valueOf()  { return 42; },\n  toString() { return \"hi\"; },\n};\nNumber(obj);    // 42    — hint \"number\", valueOf wins\nString(obj);    // \"hi\"  — hint \"string\", toString wins\nobj + \"\";       // \"42\"  — hint \"default\" → valueOf, then concat</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How does the \"default\" hint behave, and what are the exceptions?",
-              "answer": "<p class=\"answer-line\">For most objects <code>\"default\"</code> behaves like <code>\"number\"</code> (tries <code>valueOf</code> first).</p>\n<p>Two exceptions:</p>\n<p><b>1.</b> <code>Date</code> treats <code>\"default\"</code> as <code>\"string\"</code> — which is why <code>new Date() + \"\"</code> gives the date string.</p>\n<p><b>2.</b> An object with a custom <code>Symbol.toPrimitive</code> can interpret the hint however it wants.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What is Symbol.toPrimitive?",
-              "answer": "<p class=\"answer-line\"><code>Symbol.toPrimitive</code> is the ES6 hook that lets an object take full control of its own coercion: <code>ToPrimitive</code> calls it with the hint and uses whatever primitive it returns.</p>\n<p>When present, it short-circuits the <code>valueOf</code> / <code>toString</code> dance entirely.</p>\n<pre><code>const money = {\n  amount: 100,\n  [Symbol.toPrimitive](hint) {\n    if (hint === \"string\") return `$${this.amount}`;\n    if (hint === \"number\") return this.amount;\n    return `${this.amount} USD`;   // hint \"default\"\n  },\n};\n\n`${money}`;     // \"$100\"\n+money;         // 100\nmoney + \"\";     // \"100 USD\"</code></pre>\n<p>Among built-ins, <code>Date</code> and <code>Symbol</code> define it; user code rarely needs to. If a custom object coerces in a way you cannot explain, check whether it defines this method — it overrides everything.</p>",
-              "long": false,
-              "tag": "modern"
-            },
-            {
               "question": "What does ToString return for each primitive?",
               "answer": "<p class=\"answer-line\"><code>ToString</code> knows the answer for every primitive directly; for objects it delegates to <code>ToPrimitive(obj, \"string\")</code>.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Input</th><th>Result</th></tr></thead>\n<tbody>\n<tr><td class=\"mono\">undefined</td><td class=\"mono\">\"undefined\"</td></tr>\n<tr><td class=\"mono\">null</td><td class=\"mono\">\"null\"</td></tr>\n<tr><td class=\"mono\">true / false</td><td class=\"mono\">\"true\" / \"false\"</td></tr>\n<tr><td class=\"mono\">42, 3.14</td><td class=\"mono\">\"42\", \"3.14\"</td></tr>\n<tr><td class=\"mono\">NaN, Infinity, -Infinity</td><td class=\"mono\">\"NaN\", \"Infinity\", \"-Infinity\"</td></tr>\n<tr><td>very large/small numbers</td><td>exponential: <code>\"1e+21\"</code>, <code>\"1e-7\"</code></td></tr>\n<tr><td class=\"mono\">42n (bigint)</td><td class=\"mono\">\"42\"</td></tr>\n<tr><td class=\"mono\">\"hello\"</td><td class=\"mono\">\"hello\"</td></tr>\n<tr><td>object</td><td>result of <code>ToPrimitive(obj, \"string\")</code></td></tr>\n</tbody>\n</table></div>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Does ToString on a Symbol throw?",
-              "answer": "<p class=\"answer-line\">It depends on explicit vs implicit: <code>String(sym)</code> returns <code>\"Symbol(id)\"</code>, but <b>implicit</b> ToString (e.g. <code>sym + \"\"</code> or <code>`${sym}`</code>) throws <code>TypeError</code>.</p>\n<pre><code>String(Symbol(\"id\"));   // \"Symbol(id)\"\n`${Symbol(\"id\")}`;      // TypeError</code></pre>",
               "long": false,
               "tag": ""
             },
@@ -681,12 +621,6 @@
             {
               "question": "Why is ToNumber(null) different from ToNumber(undefined)?",
               "answer": "<p class=\"answer-line\">An asymmetry worth memorizing: <code>undefined</code> gives <code>NaN</code>, but <code>null</code> gives <code>0</code> — a common source of off-by-zero bugs.</p>\n<pre><code>Number(undefined);  // NaN\nNumber(null);       // 0</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How does ToNumber handle BigInt?",
-              "answer": "<p class=\"answer-line\">The abstract <code>ToNumber</code> throws <code>TypeError</code> for bigints, but <code>Number(42n)</code> is explicitly special-cased to return <code>42</code> (with possible precision loss). <code>+42n</code> still throws.</p>\n<pre><code>Number(42n);  // 42\n+42n;         // TypeError</code></pre>",
               "long": false,
               "tag": ""
             },
@@ -764,49 +698,7 @@
           "cards": [
             {
               "question": "What is the difference between explicit and implicit coercion?",
-              "answer": "<p class=\"answer-line\">Both run the same four abstract operations (<code>ToPrimitive</code>, <code>ToString</code>, <code>ToNumber</code>, <code>ToBoolean</code>) underneath — the difference is whether the conversion is <b>visible in the source</b>.</p>\n<p>Rule of thumb: if a reader new to the file would ask <b>\"wait, where is the conversion?\"</b> — it is implicit. Whether coercion feels safe or magical comes down to whether the source makes it obvious, not to what the engine does.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What does explicit coercion look like?",
-              "answer": "<p class=\"answer-line\">The code obviously says \"convert\" — a reader sees the line and immediately knows a type conversion is happening.</p>\n<pre><code>String(42);           // \"42\"\nNumber(\"3.14\");       // 3.14\nBoolean(0);           // false\nparseInt(\"42px\", 10); // 42\n+x;                   // recognised idiom: \"to number\"\n!!x;                  // recognised idiom: \"to boolean\"</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What does implicit coercion look like?",
-              "answer": "<p class=\"answer-line\">The conversion is a <b>side effect</b> of an operation that looks like it is doing something else — you must know the operator's rules to even notice it.</p>\n<pre><code>\"x\" + 1;          // \"x1\" — + silently runs ToString on 1\nx == y;           // coerces when the types differ\nif (user) { }     // ToBoolean(user) runs invisibly\n`hello ${n}`;     // template literal calls ToString on n\narr.length || 0;  // || runs ToBoolean to pick a side</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What are the explicit coercion patterns?",
-              "answer": "<p class=\"answer-line\">A handful of idioms cover every explicit conversion: <code>String(x)</code>, <code>Number(x)</code>, <code>Boolean(x)</code> for the three target types, plus <code>parseInt</code>/<code>parseFloat</code> for prefix-parsing strings.</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Goal</th><th>Idiom</th></tr></thead>\n<tbody>\n<tr><td>any → string</td><td class=\"mono\">String(x), `${x}`, x.toString() (throws for null/undefined)</td></tr>\n<tr><td>any → number</td><td class=\"mono\">Number(x), +x</td></tr>\n<tr><td>string → integer (prefix-parse)</td><td class=\"mono\">parseInt(x, 10) — always pass the radix</td></tr>\n<tr><td>string → float (prefix-parse)</td><td class=\"mono\">parseFloat(x)</td></tr>\n<tr><td>any → boolean</td><td class=\"mono\">Boolean(x), !!x</td></tr>\n<tr><td>invert truthiness</td><td class=\"mono\">!x</td></tr>\n</tbody>\n</table></div>\n<p><code>String(x)</code>, <code>Number(x)</code>, <code>Boolean(x)</code> are plain <b>conversion functions</b>: called like this, they return a primitive. They act as constructors only when called with <code>new</code> — which builds a wrapper object instead of converting.</p>\n<p><code>x.toString()</code> works too, but throws for <code>null</code> and <code>undefined</code> — <code>String(x)</code> handles them safely:</p>\n<pre><code>null.toString();  // TypeError\nString(null);     // \"null\"</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Which operators trigger which abstract operation?",
-              "answer": "<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Context</th><th>What runs</th></tr></thead>\n<tbody>\n<tr><td class=\"mono\">x + y, either operand a string</td><td>ToString on both, concatenate</td></tr>\n<tr><td class=\"mono\">x + y, no string after ToPrimitive</td><td>ToNumber on both</td></tr>\n<tr><td class=\"mono\">x - y, x * y, x / y, x % y, x ** y</td><td>ToNumber on both</td></tr>\n<tr><td class=\"mono\">x &lt; y, x &gt; y, x &lt;= y, x &gt;= y</td><td>ToNumber on both — unless both strings, then lexicographic</td></tr>\n<tr><td class=\"mono\">x == y (mixed types)</td><td>full coercion — see Equality topic</td></tr>\n<tr><td class=\"mono\">x === y</td><td><b>nothing</b> — never coerces; mismatched types are <code>false</code></td></tr>\n<tr><td class=\"mono\">if (x), while, x?a:b, !x, x&amp;&amp;y, x||y</td><td>ToBoolean(x)</td></tr>\n<tr><td class=\"mono\">`${x}`</td><td>ToString(x)</td></tr>\n<tr><td class=\"mono\">obj[x] (computed key)</td><td>ToPropertyKey(x) — symbols stay symbols, else ToString</td></tr>\n</tbody>\n</table></div>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why is + the only arithmetic operator that can produce a string?",
-              "answer": "<p class=\"answer-line\">After <code>ToPrimitive</code>, if either operand of <code>+</code> is a string it concatenates; every other arithmetic operator forces <code>ToNumber</code>.</p>\n<pre><code>\"5\" + 1;       // \"51\" — string operand → concat\n\"5\" - 1;       // 4    — minus always forces ToNumber\n\"5\" * \"2\";     // 10\n1 + null;      // 1    — no string → ToNumber: null → 0\n1 + undefined; // NaN  — undefined → NaN</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How does < compare when types differ vs when both are strings?",
-              "answer": "<p class=\"answer-line\">Mixed types go numeric (<code>ToNumber</code> on both); two strings compare character by character (lexicographic).</p>\n<pre><code>\"10\" &lt; 9;    // false — mixed → ToNumber: 10 &lt; 9\n\"10\" &lt; \"9\";  // true  — both strings → \"1\" before \"9\"</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why does \"5\" == 5 differ from \"5\" === 5?",
-              "answer": "<p class=\"answer-line\">When types differ, <code>==</code> runs a coercion algorithm and re-compares; <code>===</code> answers <code>false</code> and stops — it is the one comparison operator that never coerces anything.</p>\n<pre><code>\"5\" == 5;    // true  — types differ → == coerces, then compares\n\"5\" === 5;   // false — types differ → === returns false</code></pre>\n<p>Which coercion <code>==</code> runs is its own algorithm — covered in the Equality topic.</p>",
+              "answer": "<p class=\"answer-line\">Both run the same four abstract operations underneath — the difference is whether the conversion is <b>visible in the source</b>.</p>\n<pre><code>// Explicit — the code says \"convert\":\nString(42);   Number(\"3.14\");   Boolean(0);\n+x;           !!x;              // recognised idioms\n\n// Implicit — a hidden side effect of an operator:\n\"x\" + 1;      // + silently runs ToString on 1\nif (user) {}  // ToBoolean(user) runs invisibly\n`${n}`;       // template literal calls ToString\nx == y;       // coerces when types differ</code></pre>\n<p>Rule of thumb: if a reader asks <b>\"wait, where is the conversion?\"</b> — it's implicit.</p>",
               "long": false,
               "tag": ""
             },
@@ -815,72 +707,6 @@
               "answer": "<p class=\"answer-line\">Symbols are a coercion partial-citizen: explicit <code>String(s)</code> works, implicit string coercion throws, number coercion throws even explicitly, and boolean coercion is fine.</p>\n<pre><code>const s = Symbol(\"id\");\n\nString(s);   // \"Symbol(id)\" — explicit OK\n`${s}`;      // TypeError — implicit ToString throws\n\"\" + s;      // TypeError — same, implicit via +\n\nNumber(s);   // TypeError — even explicit\n+s;          // TypeError\n\nBoolean(s);  // true — symbols are truthy\nif (s) { /* runs */ }</code></pre>\n<p>This is deliberate: a symbol leaking into a string or a number is almost always an accident, so the language refuses to do it silently. Only the explicit <code>String(s)</code> says \"I really mean it\".</p>\n<p>Rule: with symbols, always coerce <b>explicitly</b> with <code>String()</code>. Anything implicit is likely a bug.</p>",
               "long": false,
               "tag": "trap"
-            },
-            {
-              "question": "When is implicit coercion acceptable?",
-              "answer": "<p class=\"answer-line\">When the operand types are known and the form is idiomatic. Code is communication: every coercion in the source is a message to the next reader — make sure it's the one you meant.</p>\n<p>The community splits: one camp bans <code>==</code> and <code>+</code> on non-numbers entirely; the other (Kyle Simpson) treats coercion as a tool to use with discipline.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What are the discipline rules for using coercion well?",
-              "answer": "<p class=\"answer-line\"><b>1. Know your operand types.</b> Most coercion bugs are \"I didn't know this could be a string\" — TypeScript removes this class entirely.</p>\n<p><b>2. Prefer explicit when intent isn't obvious.</b> <code>Number(x)</code> beats <code>+x</code>; <code>Boolean(x)</code> beats <code>!!x</code> when assigned to a variable.</p>\n<p><b>3. Lean on idiomatic implicit forms.</b> <code>if (user)</code> reads as \"if there's a user\"; <code>if (arr.length)</code> means \"non-empty\". Don't write <code>Boolean(arr.length) === true</code>.</p>\n<p><b>4. Comment the surprising ones</b> — e.g. a line relying on <code>null</code> → <code>0</code>.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Which coercion forms should be explicit vs implicit vs commented?",
-              "answer": "<pre><code>// Idiomatic implicit — fine:\nif (user) greet(user);\nif (arr.length) render(arr);\n\n// Intent not obvious — go explicit:\nconst count = Number(input);    // not +input\nconst isAdmin = Boolean(flag);  // not !!flag\n\n// Surprising — comment it:\nconst total = price * qty;      // qty may be null → coerces to 0</code></pre>\n<p>In review, push back when the type could plausibly be wrong — <code>if (count)</code> where <code>count</code> could legitimately be <code>0</code> — or when <code>==</code> crosses types without a comment.</p>",
-              "long": false,
-              "tag": ""
-            }
-          ]
-        },
-        {
-          "id": "corner-cases",
-          "name": "Corner cases",
-          "cards": [
-            {
-              "question": "What are the two rules that decide every + expression?",
-              "answer": "<p class=\"answer-line\">After <code>ToPrimitive</code>: if either operand is a string, <code>+</code> concatenates; otherwise both go through <code>ToNumber</code>. Every other arithmetic operator (<code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>, <code>**</code>) always forces numbers.</p>\n<p>That single asymmetry — <code>+</code> being the only operator that can produce a string — explains the whole <code>\"5\" - 1</code> vs <code>\"5\" + 1</code> family. These results aren't random: walk the algorithm and the answer is forced.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What do the classic + / arithmetic corner cases evaluate to?",
-              "answer": "<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Expression</th><th>Result</th><th>Why</th></tr></thead>\n<tbody>\n<tr><td class=\"mono\">[] + []</td><td class=\"mono\">\"\"</td><td>both → <code>\"\"</code> via ToPrimitive, then concat</td></tr>\n<tr><td class=\"mono\">[] + {}</td><td class=\"mono\">\"[object Object]\"</td><td><code>\"\" + \"[object Object]\"</code></td></tr>\n<tr><td class=\"mono\">1 + null</td><td class=\"mono\">1</td><td>numeric <code>+</code>; <code>null</code> → <code>0</code></td></tr>\n<tr><td class=\"mono\">1 + undefined</td><td class=\"mono\">NaN</td><td><code>undefined</code> → <code>NaN</code></td></tr>\n<tr><td class=\"mono\">\"5\" - 1</td><td class=\"mono\">4</td><td><code>-</code> forces numbers; <code>\"5\"</code> → <code>5</code></td></tr>\n<tr><td class=\"mono\">\"5\" + 1</td><td class=\"mono\">\"51\"</td><td>string operand → concat; <code>1</code> → <code>\"1\"</code></td></tr>\n<tr><td class=\"mono\">\"5\" - \"2\"</td><td class=\"mono\">3</td><td>both → ToNumber → <code>5 - 2</code></td></tr>\n<tr><td class=\"mono\">\"5\" + \"2\"</td><td class=\"mono\">\"52\"</td><td>both strings → concat</td></tr>\n<tr><td class=\"mono\">true + true</td><td class=\"mono\">2</td><td>no strings → ToNumber; <code>true</code> → <code>1</code></td></tr>\n</tbody>\n</table></div>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What is the skill for resolving coercion corner cases?",
-              "answer": "<p class=\"answer-line\">Not memorizing outputs — <b>walking the algorithm</b>: which operator, which hint, what <code>ToPrimitive</code> returns, then the string-or-number path. That walk resolves every expression.</p>\n<p>Note: <code>[] == ![]</code> and <code>\"0\" == false</code> (both <code>true</code>) are <code>==</code> corner cases, not operator coercion — see the Equality topic.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Walk through [] + {} step by step.",
-              "answer": "<p class=\"answer-line\">Both operands are objects, so <code>+</code> sends both through <code>ToPrimitive</code> (hint <code>\"default\"</code>); each falls through <code>valueOf</code> to <code>toString</code>, and since one result is a string, <code>+</code> concatenates.</p>\n<p><b>1.</b> No string operand yet → request <code>ToPrimitive</code> with hint <code>\"default\"</code> on both.</p>\n<p><b>2.</b> <code>[]</code> — <code>valueOf()</code> returns the array (not a primitive), so falls through to <code>toString()</code> → <code>\"\"</code>.</p>\n<p><b>3.</b> <code>{}</code> — same fall-through: <code>toString()</code> → <code>\"[object Object]\"</code>.</p>\n<p><b>4.</b> Two primitives, one is a string → concatenate.</p>\n<pre><code>[] + {};   // \"[object Object]\"\n[] + [];   // \"\"  — same walk, ends as \"\" + \"\"</code></pre>\n<p>Key fact: for plain arrays and objects, <code>valueOf</code> never yields a primitive, so <code>toString</code> always decides.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why does {} + [] give 0 in statement position?",
-              "answer": "<p class=\"answer-line\">At the start of a statement, <code>{}</code> is parsed as an empty <b>block</b>, not an object literal. What remains is <code>+[]</code> — unary plus forcing <code>ToNumber([])</code>, which is <code>0</code>.</p>\n<pre><code>{} + []   // 0 in a script — empty block, then +[] (unary plus)\n          // []  → \"\" → 0</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why does wrapping ({} + []) in parens give \"[object Object]\"?",
-              "answer": "<p class=\"answer-line\">Inside parens only an expression can appear, so <code>{}</code> becomes an object literal and the normal binary <code>+</code> walk runs.</p>\n<pre><code>({} + [])   // \"[object Object]\" — both objects → primitives\n            // \"[object Object]\" + \"\"</code></pre>\n<p>Position is everything: <code>[] + {}</code> needs no parens and gives <code>\"[object Object]\"</code> — a statement starting with <code>[</code> is already an expression; only a leading <code>{</code> triggers the block reading.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why does typing {} + [] in a console print \"[object Object]\"?",
-              "answer": "<p class=\"answer-line\">Modern consoles (Node REPL, Chrome DevTools) auto-wrap input starting with <code>{</code> in parentheses, forcing expression context. The empty-block parse only fires where statement grammar applies — a script or <code>eval</code>.</p>",
-              "long": false,
-              "tag": ""
             }
           ]
         }
@@ -925,20 +751,8 @@
               "tag": ""
             },
             {
-              "question": "Under ==, what do ToNumber and ToPrimitive do?",
-              "answer": "<p class=\"answer-line\"><code>ToNumber</code> converts a value to a number; <code>ToPrimitive</code> asks an object to turn itself into a primitive, via <code>valueOf</code> / <code>toString</code>.</p>\n<p>Their full mechanics are covered in the Coercion topic — for <code>==</code> only the order in which they apply matters.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "In a == b, does the boolean side coerce first?",
-              "answer": "<p class=\"answer-line\">Yes — the boolean side moves first (step 4), regardless of what is on the other side.</p>\n<pre><code>\"true\" == true;   // false\n// true   → 1      (boolean rule, step 4)\n// \"true\" → NaN    (string rule, step 3)\n// NaN == 1        → false</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Under ==, can a boolean ever be coerced to a string?",
-              "answer": "<p class=\"answer-line\">No. Booleans are <b>only</b> coerced to numbers under <code>==</code> — there is no path in the algorithm where a boolean ever touches <code>ToString</code>.</p>",
+              "answer": "<p class=\"answer-line\">Yes — the boolean side moves first (step 4), regardless of what is on the other side.</p>\n<pre><code>\"true\" == true;   // false\n// true   → 1      (boolean rule, step 4)\n// \"true\" → NaN    (string rule, step 3)\n// NaN == 1        → false</code></pre>\n<p>A boolean is only ever coerced to a <b>number</b> under <code>==</code> — never to a string.</p>",
               "long": false,
               "tag": ""
             },
@@ -955,28 +769,10 @@
               "tag": "trap"
             },
             {
-              "question": "Why is == not transitive, and why does it matter?",
-              "answer": "<p class=\"answer-line\">Coercion paths can connect non-equal endpoints through a shared value, so <code>a == b</code> and <code>b == c</code> does <b>not</b> imply <code>a == c</code>.</p>\n<pre><code>0 == \"\";      // true   — \"\" → 0\n0 == \"0\";     // true   — \"0\" → 0\n\"\" == \"0\";    // false  — same type: plain string compare</code></pre>\n<p>Both strings coerce to <code>0</code> against a number. But against each other, no coercion runs — same type, and <code>\"\"</code> and <code>\"0\"</code> are different strings.</p>\n<p>Why it matters: <code>==</code> is therefore not a proper equivalence relation, so it cannot be the equality of any structure that requires uniqueness — <code>Set</code>, <code>Map</code> keys, deduplication. A <code>Set</code> could not maintain its no-duplicates invariant under a non-transitive equality. That is the formal reason collections use SameValueZero instead.</p>",
+              "question": "When is == fine to use, and when should you avoid it?",
+              "answer": "<p class=\"answer-line\"><code>==</code> is fine in two cases: <code>x == null</code> (catches <code>null</code> and <code>undefined</code>, nothing else — idiomatic) and when both sides are the <b>same type</b> (mechanically identical to <code>===</code>, pure style).</p>\n<p>Avoid it only when either side could be <code>true</code>, <code>false</code>, <code>0</code>, <code>\"\"</code>, or <code>[]</code> — their coercion paths intersect at <code>0</code> and produce the surprises.</p>\n<pre><code>[] == false;   // true\n\"\" == 0;       // true\n0 == \"0\";      // true</code></pre>\n<p>Deeper principle: the danger isn't the operator — it's not knowing the types. With TypeScript the types are visible and the debate evaporates.</p>",
               "long": false,
               "tag": "interview"
-            },
-            {
-              "question": "In which two cases is == preferable over ===?",
-              "answer": "<p class=\"answer-line\">Two cases:</p>\n<div class=\"wrap-tbl\"><table class=\"tbl\">\n<thead><tr><th>Case</th><th>Why</th></tr></thead>\n<tbody>\n<tr><td><code>x == null</code></td><td>Catches <code>null</code> and <code>undefined</code>, nothing else — idiomatic and shorter than the strict version</td></tr>\n<tr><td>Both sides same type</td><td>When operands are guaranteed the same type, <code>==</code> is mechanically identical to <code>===</code> — the choice is pure style</td></tr>\n</tbody>\n</table></div>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "When should you avoid == — and when is it actually fine?",
-              "answer": "<p class=\"answer-line\">Avoid <code>==</code> only if either side could be <code>true</code>, <code>false</code>, <code>0</code>, <code>\"\"</code>, or <code>[]</code> — their coercion paths intersect at <code>0</code> and produce the surprises. Outside those five values, <code>==</code> is fine.</p>\n<pre><code>[] == false;   // true\n\"\" == 0;       // true\n0 == \"0\";      // true</code></pre>\n<p>The rule is permissive, not a ban — it draws the line at five dangerous values, not around the whole operator.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What's the deeper principle behind the == vs === debate?",
-              "answer": "<p class=\"answer-line\"><b>Type-awareness.</b> The dangerous part is not the operator — it's not knowing the types of both sides.</p>\n<p>With TypeScript the types are visible in the source, so most <code>==</code> vs <code>===</code> debates evaporate.</p>",
-              "long": false,
-              "tag": ""
             }
           ]
         },
@@ -999,12 +795,6 @@
             {
               "question": "Why use Object.is at the leaves of a deep-equal?",
               "answer": "<p class=\"answer-line\">Because <code>NaN === NaN</code> is <code>false</code>, so a naive <code>===</code> base case reports <code>{ x: NaN }</code> and <code>{ x: NaN }</code> as unequal. <code>Object.is</code> is NaN-safe and fixes that.</p>\n<pre><code>function deepEqual(a, b) {\n  if (Object.is(a, b)) return true;   // base case — NaN-safe\n  // ...otherwise recurse into the keys of a and b...\n}\n\ndeepEqual({ x: NaN }, { x: NaN });    // true — with ===, false</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "When does the sign of zero matter, and how do you preserve it?",
-              "answer": "<p class=\"answer-line\">Floating-point division preserves direction through zero, so the sign of <code>0</code> records which side a value approached from. <code>Object.is</code> is how you distinguish <code>+0</code> from <code>-0</code> when you need it.</p>\n<pre><code>1 / +0;   // Infinity\n1 / -0;   // -Infinity</code></pre>\n<p>Matters in math libraries and physics simulations; ordinary application code rarely does. (What <code>-0</code> is and why <code>NaN !== NaN</code> are covered in the Types topic.)</p>",
               "long": false,
               "tag": ""
             },
@@ -1064,15 +854,9 @@
           "cards": [
             {
               "question": "Does JavaScript really run top to bottom?",
-              "answer": "<p class=\"answer-line\">No — it looks interpreted, but the engine makes two passes over your code: a compile pass, then an execute pass. The whole file is read before line 1 executes.</p>\n<p><b>Compile pass</b> — parse the entire source, and for every scope, register the declarations it contains: <code>var</code>, <code>let</code>, <code>const</code>, <code>function</code>, parameters. No assignments run yet.</p>\n<p><b>Execute pass</b> — run the code line by line. Assignments happen here, and lookups resolve against the scopes set up in pass 1.</p>\n<p>You can see the first pass directly: a syntax error at the bottom of a file stops even the first line from running, because the whole file is parsed before anything executes.</p>\n<pre><code>console.log(\"start\");   // never prints\n\nconst x = ;             // SyntaxError — caught in the compile pass</code></pre>",
+              "answer": "<p class=\"answer-line\">No — the engine makes two passes. <b>Compile pass:</b> parse the whole file and register every declaration (<code>var</code>, <code>let</code>, <code>const</code>, <code>function</code>, parameters) in its scope — no assignments run. <b>Execute pass:</b> run line by line; assignments happen and lookups resolve against the scopes from pass 1.</p>\n<p>So <b>where every variable lives is fixed at parse time, and that decision is permanent.</b></p>\n<pre><code>var a = 2;\n// compile pass:  register `a` in this scope\n// execute pass:  a = 2</code></pre>\n<p>This split is exactly why hoisting works — declarations are handled up front, assignments stay in place (see Hoisting &amp; TDZ).</p>",
               "long": false,
               "tag": ""
-            },
-            {
-              "question": "When is a variable's scope decided?",
-              "answer": "<p class=\"answer-line\">At parse time, during the compile pass — where every variable lives is fixed before any code runs, and that decision is permanent.</p>\n<p>During the compile pass the engine registers each declaration in its scope. By the time execution starts, every name already exists in the right place; the execute pass only runs assignments and resolves lookups against that fixed map.</p>\n<p>This split is exactly why hoisting works. The engine reads <code>var a = 2;</code> as two operations in two different passes:</p>\n<pre><code>var a = 2;\n// compile pass:  register `a` in this scope\n// execute pass:  a = 2</code></pre>\n<p>So hoisting is not magic: execution is a second pass — declarations are handled up front, assignments stay in place. The mechanics (<code>function</code> vs <code>var</code> vs <code>let</code>, TDZ) are covered in the Hoisting &amp; TDZ subtopic.</p>",
-              "long": false,
-              "tag": "interview"
             }
           ]
         },
@@ -1088,13 +872,7 @@
             },
             {
               "question": "Does the call site affect which outer variable a function sees?",
-              "answer": "<p class=\"answer-line\">No. Lookup follows where the function is <b>written</b>, not where it is <b>called</b> — the call stack plays no part.</p><pre><code>function foo() {\n  console.log(a);   // which `a`?\n}\nfunction bar() {\n  var a = 2;\n  foo();            // foo is CALLED here, where a === 2\n}\nvar a = 1;          // foo is WRITTEN here, next to a === 1\nbar();              // logs 1</code></pre><p><code>foo</code> looks in its outer scope — the <b>global</b> scope, where it is written — so it finds <code>a = 1</code>. That <code>bar</code> called it is invisible.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How would you make foo log 2 instead of 1?",
-              "answer": "<p class=\"answer-line\">Move <code>foo</code>'s declaration <b>inside</b> <code>bar</code>, so it is lexically nested where <code>a = 2</code> lives. Change the writing, change the lookup.</p>",
+              "answer": "<p class=\"answer-line\">No. Lookup follows where the function is <b>written</b>, not where it is <b>called</b> — the call stack plays no part.</p><pre><code>function foo() {\n  console.log(a);   // which `a`?\n}\nfunction bar() {\n  var a = 2;\n  foo();            // foo is CALLED here, where a === 2\n}\nvar a = 1;          // foo is WRITTEN here, next to a === 1\nbar();              // logs 1</code></pre><p><code>foo</code> looks in its outer scope — the <b>global</b> scope, where it is written — so it finds <code>a = 1</code>. That <code>bar</code> called it is invisible.</p>\n<p>To make <code>foo</code> log <code>2</code>, move its declaration <b>inside</b> <code>bar</code> — change the writing, change the lookup.</p>",
               "long": false,
               "tag": ""
             },
@@ -1130,13 +908,7 @@
           "cards": [
             {
               "question": "What are LHS and RHS references?",
-              "answer": "<p class=\"answer-line\">Every variable reference is one of two kinds: an <b>LHS</b> reference is a <b>target</b> — the variable is being assigned to (<code>x = 5</code>); an <b>RHS</b> reference is a <b>source</b> — its value is being retrieved (<code>console.log(x)</code>).</p><pre><code>let x;\nx = 5;            // LHS — value goes INTO x (target)\nconsole.log(x);   // RHS — value is read OUT of x (5)</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why isn't LHS/RHS just about which side of the = a variable is on?",
-              "answer": "<p class=\"answer-line\">The names come from the sides of <code>=</code>, but that's only loose — <code>console.log(x)</code> has no <code>=</code> at all and is still an RHS. The real distinction: is a value going <b>into</b> the variable (target) or coming <b>out</b> of it (source)?</p>",
+              "answer": "<p class=\"answer-line\">Every variable reference is one of two kinds: an <b>LHS</b> reference is a <b>target</b> — the variable is being assigned to (<code>x = 5</code>); an <b>RHS</b> reference is a <b>source</b> — its value is being retrieved (<code>console.log(x)</code>).</p><pre><code>let x;\nx = 5;            // LHS — value goes INTO x (target)\nconsole.log(x);   // RHS — value is read OUT of x (5)</code></pre><p>The names come from the sides of <code>=</code>, but only loosely — <code>console.log(x)</code> has no <code>=</code> and is still RHS. The real test: is a value going <b>into</b> the variable, or coming <b>out</b>?</p>",
               "long": false,
               "tag": ""
             },
@@ -1148,27 +920,9 @@
             },
             {
               "question": "What happens when a variable lookup fails?",
-              "answer": "<p class=\"answer-line\">The kind of reference decides the failure.</p><div class=\"wrap-tbl\"><table class=\"tbl\"><thead><tr><th>Reference</th><th>Sloppy mode</th><th>Strict mode</th></tr></thead><tbody><tr><td><b>RHS</b> (reading undeclared)</td><td><code>ReferenceError</code></td><td><code>ReferenceError</code></td></tr><tr><td><b>LHS</b> (assigning undeclared)</td><td>silently creates a <b>global</b></td><td><code>ReferenceError</code></td></tr></tbody></table></div>",
+              "answer": "<p class=\"answer-line\">The kind of reference decides the failure.</p><div class=\"wrap-tbl\"><table class=\"tbl\"><thead><tr><th>Reference</th><th>Sloppy mode</th><th>Strict mode</th></tr></thead><tbody><tr><td><b>RHS</b> (reading undeclared)</td><td><code>ReferenceError</code></td><td><code>ReferenceError</code></td></tr><tr><td><b>LHS</b> (assigning undeclared)</td><td>silently creates a <b>global</b></td><td><code>ReferenceError</code></td></tr></tbody></table></div><pre><code>function f() {\n  leak = 10;        // LHS, never declared → creates a GLOBAL (sloppy)\n}\nf();\nconsole.log(leak);  // 10 — leaked out of the function</code></pre><p>That sloppy-mode <b>accidental-global footgun</b> is why a forgotten <code>let</code> leaks a global. Strict mode closes it — a failed LHS throws instead — and ES modules and class bodies are strict by default.</p>",
               "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What is the accidental-global footgun?",
-              "answer": "<p class=\"answer-line\">A failed <b>LHS</b> in sloppy mode silently creates a global instead of erroring — so a forgotten <code>let</code> leaks a global rather than complaining.</p><pre><code>function f() {\n  leak = 10;        // LHS, never declared → creates a GLOBAL `leak`\n}\nf();\nconsole.log(leak);     // 10 — leaked out of the function\nconsole.log(missing);  // RHS, never declared → ReferenceError</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How does strict mode close the accidental-global footgun?",
-              "answer": "<p class=\"answer-line\">In strict mode a failed LHS throws <code>ReferenceError</code>, just like a failed RHS.</p><pre><code>\"use strict\";\nfunction f() {\n  leak = 10;        // ReferenceError: leak is not defined\n}\nf();</code></pre><p>ES modules and class bodies are strict by default, so modern code gets this protection for free.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Does typeof of an undeclared name throw?",
-              "answer": "<p class=\"answer-line\">No — <code>typeof</code> of an undeclared name returns <code>\"undefined\"</code> instead of throwing. The one exception is inside a TDZ, where even <code>typeof</code> throws (see Hoisting &amp; TDZ).</p>",
-              "long": false,
-              "tag": ""
+              "tag": "trap"
             }
           ]
         },
@@ -1195,44 +949,14 @@
               "tag": ""
             },
             {
-              "question": "Why do var declarations hoist but their assignments don't?",
-              "answer": "<p class=\"answer-line\">The two passes split the work: a declaration is static information the parser can register up front, while an assignment is runtime work that must wait for the execute pass. \"Hoisting\" is just the name for how that split looks from the outside.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "What is the temporal dead zone (TDZ)?",
-              "answer": "<p class=\"answer-line\">The stretch from the start of a scope to the <code>let</code>/<code>const</code> declaration line, during which the variable <b>exists but is uninitialized</b> — any access throws <code>ReferenceError</code>.</p><pre><code>console.log(user); // ReferenceError: Cannot access 'user' before initialization\nlet user = \"Ann\";</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Are let and const hoisted like var?",
-              "answer": "<p class=\"answer-line\">Yes — both are registered at compile time. The difference is what happens next: <code>var</code> is initialized to <code>undefined</code> immediately, while <code>let</code>/<code>const</code> are left <b>uninitialized</b> until the declaration line runs.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What does the TDZ error message tell you?",
-              "answer": "<p class=\"answer-line\">It is <b>\"cannot access before initialization\"</b>, not \"<code>user</code> is not defined\". The variable is there — it is in its dead zone, not missing.</p>",
+              "answer": "<p class=\"answer-line\">The stretch from the start of a scope to the <code>let</code>/<code>const</code> declaration line, during which the variable <b>exists but is uninitialized</b> — any access throws <code>ReferenceError</code>.</p><pre><code>console.log(user); // ReferenceError: Cannot access 'user' before initialization\nlet user = \"Ann\";</code></pre><p>The error reads <b>\"cannot access before initialization\"</b> (not \"not defined\") — the variable exists, just in its dead zone. It's <b>temporal</b>: about execution time, not text position. Code above may mention it, as long as it <b>runs</b> after the declaration:</p><pre><code>function read() { return token; }  // mentions token before its line — fine\nlet token = \"abc\";\nread(); // \"abc\" — by call time the declaration has run</code></pre>",
               "long": false,
               "tag": ""
             },
             {
               "question": "Does the TDZ block reaching an outer variable of the same name?",
               "answer": "<p class=\"answer-line\">Yes. The inner variable is registered for its <b>whole</b> scope, so its TDZ shadows the outer one even on lines above the declaration.</p><pre><code>let x = 1;\nfunction func() {\n  console.log(x); // ReferenceError — the inner x exists here, but is in its TDZ\n  let x = 2;\n}\nfunc();</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why is it called the *temporal* dead zone?",
-              "answer": "<p class=\"answer-line\">Because it's about execution <b>time</b>, not position in the text. Code written above the declaration may mention the variable, as long as it <b>runs</b> after the declaration has executed.</p><pre><code>function read() { return token; } // mentions token before its line — fine\nlet token = \"abc\";\nconsole.log(read()); // \"abc\" — by call time the declaration has run</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Does typeof throw inside the TDZ?",
-              "answer": "<p class=\"answer-line\">Yes — unlike <code>typeof</code> of a truly undeclared name, which returns <code>\"undefined\"</code>.</p><pre><code>console.log(typeof neverDeclared); // \"undefined\" — safe\nconsole.log(typeof token);         // ReferenceError — token is in its TDZ\nlet token = \"abc\";</code></pre>",
               "long": false,
               "tag": ""
             },
@@ -1253,12 +977,6 @@
               "answer": "<p class=\"answer-line\">No — <code>var</code> ignores blocks entirely; an <code>if</code> or <code>for</code> body does not contain it, the nearest function does. <code>let</code>/<code>const</code> stay inside the block.</p><pre><code>function run() {\n  if (true) {\n    var v = 1;\n    let l = 2;\n  }\n  console.log(v); // 1 — var ignored the block, lives in the function\n  console.log(l); // ReferenceError: l is not defined\n}\nrun();</code></pre>",
               "long": false,
               "tag": ""
-            },
-            {
-              "question": "What hoists for a function expression?",
-              "answer": "<p class=\"answer-line\">Only the <b>variable</b> hoists, not the function — calling it before the assignment is a <code>TypeError</code>, because the name still holds <code>undefined</code>. The declaration-vs-expression rules live in the Function Expressions &amp; Scope topic; the rest of <code>var</code>'s quirks in the Global Scope &amp; var topic.</p>",
-              "long": false,
-              "tag": ""
             }
           ]
         },
@@ -1268,13 +986,7 @@
           "cards": [
             {
               "question": "What is shadowing?",
-              "answer": "<p class=\"answer-line\">When an inner scope declares a variable with the same name as an outer one, the inner declaration <b>shadows</b> the outer: inside that scope, the name refers to the inner variable only.</p><p class=\"answer-line\">It falls out of how lookup works — the search walks outward and stops at the <b>first</b> match.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Does shadowing destroy or change the outer variable?",
-              "answer": "<p class=\"answer-line\">No — the outer variable still exists and keeps its value; it just can't be reached from inside the shadow, because lookup never walks past the inner match.</p><pre><code>let answer = \"outer\";\nfunction show() {\n  let answer = \"inner\";   // shadows the outer `answer`\n  console.log(answer);    // \"inner\" — lookup stops at the first match\n}\nshow();                   // \"inner\"\nconsole.log(answer);      // \"outer\" — still exists, untouched</code></pre>",
+              "answer": "<p class=\"answer-line\">When an inner scope declares a variable with the same name as an outer one, the inner declaration <b>shadows</b> the outer: inside that scope, the name refers to the inner variable only.</p><pre><code>let answer = \"outer\";\nfunction show() {\n  let answer = \"inner\";   // shadows the outer `answer`\n  console.log(answer);    // \"inner\"\n}\nshow();                   // \"inner\"\nconsole.log(answer);      // \"outer\" — outer still exists, untouched</code></pre><p>It falls out of how lookup works — the search walks outward and stops at the <b>first</b> match, so the outer variable is untouched, just unreachable from inside.</p>",
               "long": false,
               "tag": ""
             },
@@ -1304,7 +1016,7 @@
           "cards": [
             {
               "question": "What is an execution context?",
-              "answer": "<p class=\"answer-line\">The environment a piece of code runs in. The engine creates one before executing the code, and it holds everything that code needs — its variables and the value of <code>this</code>.</p>",
+              "answer": "<p class=\"answer-line\">When a function (or the top-level script) starts running, the engine creates a <b>\"box\" for that run</b> — holding everything the code needs:</p>\n<ul>\n  <li>the scope's <b>local variables</b> (its <i>environment record</i>),</li>\n  <li>the value of <b><code>this</code></b>,</li>\n  <li>a link to <b>where the function was written</b> (<code>[[Environment]]</code> — the scope chain follows this).</li>\n</ul>\n<p>Every <b>call</b> gets a fresh box; when the call returns, the box is gone (popped off the call stack).</p>",
               "long": false,
               "tag": ""
             },
@@ -1327,26 +1039,8 @@
               "tag": ""
             },
             {
-              "question": "How do execution contexts relate to scope?",
-              "answer": "<p class=\"answer-line\">Each execution context holds an <b>environment record</b> — the internal object where that scope's variables actually live. The scope chain is a chain of these environment records.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What fixes the shape of the scope chain — and what is [[Environment]]?",
-              "answer": "<p class=\"answer-line\">The chain's shape is fixed <b>lexically</b>. Every function carries a hidden <code>[[Environment]]</code> reference to the environment where it was <b>written</b>, set once at creation. So lookup follows the source text — own record → outer → … → global — never the call stack.</p><pre><code>function foo() {\n  console.log(a);\n}\nfunction bar() {\n  var a = 2;\n  foo();            // bar's context is on the stack — but not in foo's chain\n}\nvar a = 1;\nbar();              // 1</code></pre><p><code>foo</code> was written at the top level, so its chain goes straight to the global record; <code>bar</code>'s record is on the stack, not in the chain.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How do the lifetimes of execution contexts and lexical structure differ?",
-              "answer": "<p class=\"answer-line\">Contexts and their records are <b>created and destroyed with calls</b>; the lexical structure they plug into is fixed when the code is parsed and never changes.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Is `this` part of the scope chain?",
-              "answer": "<p class=\"answer-line\">No — <code>this</code> lives in the context but is <b>not</b> part of the scope chain; it is resolved by call-site rules (see the this &amp; Binding topic). What happens when a record must outlive its call is the Closure topic.</p>",
+              "question": "How do execution contexts relate to scope, and what is [[Environment]]?",
+              "answer": "<p class=\"answer-line\">Each context holds an <b>environment record</b> — where that scope's variables live — and the scope chain is a chain of these records.</p><p>The chain's shape is fixed <b>lexically</b>: every function carries a hidden <code>[[Environment]]</code> reference to where it was <b>written</b>, set once at creation. So lookup follows the source text (own record → outer → … → global), never the call stack.</p><pre><code>function foo() { console.log(a); }\nfunction bar() {\n  var a = 2;\n  foo();   // bar's context is on the stack — but not in foo's chain\n}\nvar a = 1;\nbar();     // 1</code></pre><p>Contexts and their records are created and destroyed with <b>calls</b>; the lexical structure they plug into is fixed at parse time and never changes.</p>",
               "long": false,
               "tag": ""
             }
