@@ -1075,12 +1075,6 @@
               "tag": ""
             },
             {
-              "question": "Why does the receiving function not need to know what the callback does?",
-              "answer": "<p class=\"answer-line\">The caller supplies the actions as values; the receiver only picks which one to invoke. <code>ask</code> doesn't know what agreeing or canceling should mean — it just calls one of the functions back.</p>\n<p>In a browser, the <code>answer</code> would come from <code>confirm(question)</code> asking a real user, while the <code>yes</code>/<code>no</code> handlers stay entirely up to the caller.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "Do callbacks need to be named functions?",
               "answer": "<p class=\"answer-line\">No — a function expression can be written inline right inside the call, created on the spot and unreachable outside it.</p>\n<pre><code>ask(\n  \"Do you agree?\", false,\n  function() { console.log(\"You agreed.\"); },\n  function() { console.log(\"You canceled.\"); }\n);\n// Do you agree?\n// You canceled.</code></pre>\n<p>This anonymous inline form is the everyday shape of callbacks: array methods like <code>[1, 2, 3].map(n =&gt; n * 2)</code>, timers, and event handlers all take them.</p>",
               "long": false,
@@ -1105,20 +1099,8 @@
               "tag": ""
             },
             {
-              "question": "Why does a function expression end with a semicolon but a declaration doesn't?",
-              "answer": "<p class=\"answer-line\">An expression assignment is an ordinary statement, like <code>let x = 5;</code>, so it ends with <code>;</code>. A declaration is not an assignment — no semicolon needed.</p>\n<p>The semicolon terminates the assignment statement, not the function syntax itself.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "Should you default to function declarations or expressions?",
               "answer": "<p class=\"answer-line\">Default to <b>declarations</b>. Reach for an <b>expression</b> only when the function is genuinely a value: created conditionally, passed inline, or stored in a data structure.</p>\n<p>Declarations win on readability — <code>function calcRent(...)</code> is easier to spot than <code>let calcRent = function(...)</code> — and they're callable anywhere in their scope, so you can put main logic at the top of a file and helpers below.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "When does a function expression beat a declaration?",
-              "answer": "<p class=\"answer-line\">When creation depends on a condition — a declaration can't do this (in strict mode it stays trapped inside the branch's block).</p>\n<pre><code>let age = 16;\n\nlet welcome = (age &lt; 18)\n  ? function() { console.log(\"Hello!\"); }\n  : function() { console.log(\"Greetings!\"); };\n\nwelcome();   // \"Hello!\"</code></pre>\n<p>The other natural homes for expressions: a callback passed straight into another function, and a function stored as an object property or array element. For short inline callbacks an arrow is usual — <code>[1, 2, 3].map(n =&gt; n * 2)</code>.</p>",
               "long": false,
               "tag": ""
             }
@@ -1167,12 +1149,6 @@
             {
               "question": "Can a function carry custom properties?",
               "answer": "<p class=\"answer-line\">Yes. A function is an object, so you can attach your own properties — <code>sayHi.counter = 0</code> — and they live on the function like properties on any object.</p>\n<pre><code>function sayHi() {\n  console.log(\"Hi\");\n  sayHi.counter++;   // state stored on the function itself\n}\nsayHi.counter = 0;\n\nsayHi();\nsayHi();\n\nconsole.log(`Called ${sayHi.counter} times`); // Called 2 times</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Is a function property the same as a variable inside the function?",
-              "answer": "<p class=\"answer-line\">No — <code>sayHi.counter</code> and a <code>let counter</code> in the body are unrelated: one is a property on the object, the other a variable in the scope.</p>",
               "long": false,
               "tag": ""
             },
@@ -1359,12 +1335,6 @@
             {
               "question": "What happens when you redeclare a var with the same name?",
               "answer": "<p class=\"answer-line\">It's silently ignored — the second <code>var</code> acts as a plain assignment, no error.</p>\n<pre><code>var user = \"Pete\";\nvar user = \"John\"; // no error\nconsole.log(user); // John</code></pre>\n<p>With <code>let</code>, the second declaration throws <code>SyntaxError: Identifier 'user' has already been declared</code>.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why are var's hoisting and redeclaration behaviors considered bug-prone?",
-              "answer": "<p class=\"answer-line\">Both hide bugs: a read placed too early quietly gives <code>undefined</code>, and a duplicate declaration quietly overwrites an existing variable. <code>let</code>/<code>const</code> turn both into <b>immediate errors</b> you see right away.</p>",
               "long": false,
               "tag": ""
             },
@@ -1603,12 +1573,6 @@
               "tag": ""
             },
             {
-              "question": "Why can't Node re-run a module during a circular require?",
-              "answer": "<p class=\"answer-line\">When <code>a.js</code> requires <code>b.js</code> which requires <code>a.js</code> back, <code>a.js</code> is mid-run and <b>already in the cache</b> — so <code>b.js</code> receives a reference to the half-finished exports object.</p><pre><code>// a.js\nexports.loaded = false;\nconst b = require(\"./b\");  // b runs now, sees {loaded: false}\nexports.loaded = true;     // same object — b's reference sees this\n\n// b.js\nconst a = require(\"./a\");\na.loaded; // false — a.js hasn't finished yet\nsetTimeout(() =&gt; console.log(a.loaded)); // true — the mutation is visible</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "When does a value freeze (stop updating) during a CommonJS cycle?",
               "answer": "<p class=\"answer-line\">Two cases:</p><div class=\"wrap-tbl\"><table class=\"tbl\"><thead><tr><th>Case</th><th>Why it freezes</th></tr></thead><tbody><tr><td class=\"mono\">const { loaded } = require(\"./a\")</td><td>destructuring copies the current value, which never follows</td></tr><tr><td class=\"mono\">module.exports = {...}</td><td>first module reassigns; requirer still holds the old object</td></tr></tbody></table></div>",
               "long": false,
@@ -1729,12 +1693,6 @@
               "tag": ""
             },
             {
-              "question": "Can you reassign an imported binding in ESM?",
-              "answer": "<p class=\"answer-line\">No — the binding is <b>read-only</b> on the importer's side. Assigning to <code>count</code> in the importing module is an error.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "Why is static import \"static\" and what does that enable?",
               "answer": "<p class=\"answer-line\">Unlike <code>require</code> (an ordinary runtime call), <code>import</code> is rigid by design — so the whole module graph is known <b>before execution</b>: missing names fail early, and bundlers can tree-shake unused exports. (Run-time loading via <code>import()</code> — see <b>Dynamic import</b>.)</p>",
               "long": false,
@@ -1749,12 +1707,6 @@
             {
               "question": "What happens when you read a not-yet-initialized import at the top level in a cycle?",
               "answer": "<p class=\"answer-line\">It behaves exactly like the underlying declaration:</p><div class=\"wrap-tbl\"><table class=\"tbl\"><thead><tr><th>Declaration</th><th>Top-level read in cycle</th></tr></thead><tbody><tr><td class=\"mono\">let / const</td><td>still in TDZ → <code>ReferenceError</code></td></tr><tr><td class=\"mono\">function</td><td>hoisted → already callable</td></tr><tr><td class=\"mono\">var</td><td>reads <code>undefined</code></td></tr></tbody></table></div><pre><code>// a.mjs: export let loaded = ...; export function check() {...}\n\n// b.mjs — runs while a.mjs is still initializing\nimport { loaded, check } from \"./a.mjs\";\nloaded;   // ReferenceError — let binding still in TDZ\ncheck();  // works — function declarations are hoisted\n\nexport function report() {\n  return loaded; // fine — called after init, binding is live\n}</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What are the rules of thumb for ESM circular imports?",
-              "answer": "<p class=\"answer-line\">Don't use imported values at the <b>top level</b> in a cycle — defer the use into functions; and treat a cycle as a <b>design smell</b>, extracting the shared piece into a third module to dissolve the loop. (CommonJS resolves cycles differently — see <b>CommonJS</b>.)</p>",
               "long": false,
               "tag": ""
             }
@@ -1988,13 +1940,7 @@
             },
             {
               "question": "What does configurable: false do, and can it be undone?",
-              "answer": "<p class=\"answer-line\">It's a one-way door: the property can no longer be deleted or have its flags changed, and <code>configurable: false</code> itself can't be reversed — not even by <code>defineProperty</code>. <code>Math.PI</code> is the classic example (non-writable, non-enumerable, non-configurable).</p>\n<pre><code>Object.defineProperty(user, \"name\", { configurable: false });\ndelete user.name;                                    // ignored / throws in strict\nObject.defineProperty(user, \"name\", { enumerable: false }); // TypeError</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Is there any change allowed on a non-configurable property?",
-              "answer": "<p class=\"answer-line\">One exception: you may still flip <code>writable</code> from <code>true</code> to <code>false</code> — tightening only. No other flag change is permitted.</p>",
+              "answer": "<p class=\"answer-line\">It's a one-way door: the property can no longer be deleted or have its flags changed, and <code>configurable: false</code> itself can't be reversed — not even by <code>defineProperty</code>. <code>Math.PI</code> is the classic example (non-writable, non-enumerable, non-configurable).</p>\n<pre><code>Object.defineProperty(user, \"name\", { configurable: false });\ndelete user.name;                                    // ignored / throws in strict\nObject.defineProperty(user, \"name\", { enumerable: false }); // TypeError</code></pre>\n<p>One exception: you may still tighten <code>writable</code> from <code>true</code> to <code>false</code> — no other flag change is permitted.</p>",
               "long": false,
               "tag": ""
             }
@@ -2019,12 +1965,6 @@
             {
               "question": "In what order do for..in and Object.keys list keys?",
               "answer": "<p class=\"answer-line\">Integer-like keys first, sorted ascending; all other keys after, in creation order. An integer property is a string that converts to an integer and back unchanged — <code>\"49\"</code> qualifies, <code>\"+49\"</code> and <code>\"1.2\"</code> don't.</p>\n<pre><code>let codes = { \"49\": \"Germany\", \"41\": \"Switzerland\", \"1\": \"USA\" };\nObject.keys(codes); // [\"1\", \"41\", \"49\"] — sorted, not creation order</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "How do you keep numeric-looking keys in creation order?",
-              "answer": "<p class=\"answer-line\">Make them non-integer so they skip the ascending sort — e.g. prefix each with <code>\"+\"</code>. They then list in creation order like normal string keys.</p>",
               "long": false,
               "tag": ""
             }
@@ -2113,12 +2053,6 @@
               "tag": ""
             },
             {
-              "question": "Why assume strict mode for default binding?",
-              "answer": "<p class=\"answer-line\">Code inside <b>ES modules and class bodies always runs strict</b>, so <code>this</code> is <code>undefined</code> there with default binding. Reading <code>this.name</code> in that case <b>throws</b>.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
               "question": "What is implicit binding?",
               "answer": "<p class=\"answer-line\">A method call <code>obj.foo()</code> through an object: <code>this</code> is whatever sits immediately <b>left of the dot</b> at the call-site.</p><pre><code>const obj = { name: \"obj\", greet() { return this.name; } };\nobj.greet()               // \"obj\"</code></pre>",
               "long": false,
@@ -2169,12 +2103,6 @@
             {
               "question": "How do you lose this?",
               "answer": "<p class=\"answer-line\">By <b>detaching</b> a method from its object. <code>obj.method()</code> binds <code>this</code> to <code>obj</code>, but <code>obj.method</code> alone is a plain function value with no link back to <code>obj</code> — the dot at call time is what binds <code>this</code>.</p><pre><code>'use strict';\nconst user = {\n  firstName: \"John\",\n  sayHi() { console.log(`Hello, ${this.firstName}`); }\n};\n\nuser.sayHi();          // Hello, John   (this = user)\n\nconst f = user.sayHi;  // just a function value, no object\nf();                   // TypeError: Cannot read properties of undefined</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What this does a detached method get when called standalone?",
-              "answer": "<p class=\"answer-line\">The default binding: <code>this</code> is <code>undefined</code> in strict mode (so <code>this.firstName</code> <b>throws</b>), or the global object in sloppy mode (so <code>this.firstName</code> is silently <code>undefined</code>).</p><pre><code>// sloppy mode\nconst f = user.sayHi;\nf();  // this = global object, this.firstName = undefined</code></pre>",
               "long": false,
               "tag": ""
             },
@@ -2291,12 +2219,6 @@
               "answer": "<p class=\"answer-line\">Then <code>this</code> is the <b>scope where the object literal sits</b>, not the object. So it reads the wrong value or throws.</p><pre><code>const obj = {\n  x: 5,\n  getXArrow: () =&gt; this.x,      // this = enclosing scope, NOT obj\n  getXMethod() { return this.x; } // this = obj\n};\n\nobj.getXMethod(); // 5\nobj.getXArrow();  // undefined  (or throws)</code></pre>",
               "long": false,
               "tag": ""
-            },
-            {
-              "question": "What is the arrow method's this in different environments?",
-              "answer": "<p class=\"answer-line\">It depends on the surrounding scope, and never sees <code>obj</code>.</p><div class=\"wrap-tbl\"><table class=\"tbl\"><thead><tr><th>Environment</th><th>top-level <code>this</code></th><th><code>obj.getXArrow()</code></th></tr></thead><tbody><tr><td>browser <code>&lt;script&gt;</code></td><td class=\"mono\">window</td><td><code>undefined</code></td></tr><tr><td>CommonJS module</td><td class=\"mono\">module.exports</td><td><code>undefined</code></td></tr><tr><td>ES module</td><td class=\"mono\">undefined</td><td>throws <code>TypeError</code></td></tr></tbody></table></div>",
-              "long": false,
-              "tag": ""
             }
           ]
         },
@@ -2325,12 +2247,6 @@
             {
               "question": "Which operations throw away the base object of obj.method?",
               "answer": "<p class=\"answer-line\">Almost any operation other than the call reads the plain function value <b>out</b> of the reference: assignment, passing as an argument, a ternary, a <code>||</code>.</p><pre><code>let user = {\n  name: \"John\",\n  hi() { return this.name; },\n  bye() { return \"bye \" + this.name; },\n};\n\nuser.hi(); // \"John\" — () reads the reference, base = user\n\nlet cond = true;\n(cond ? user.hi : user.bye)();\n// TypeError: Cannot read properties of undefined (reading 'name')</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Which operations keep vs discard the Reference Type?",
-              "answer": "<p class=\"answer-line\"><code>this</code> survives only when <code>()</code> is applied directly to <code>obj.method</code> (or a parenthesized form). The instant another operation consumes it, it unwraps to the bare function.</p><div class=\"wrap-tbl\"><table class=\"tbl\"><thead><tr><th>Operation</th><th>Reference kept?</th></tr></thead><tbody><tr><td class=\"mono\">obj.m()</td><td>yes — call reads it directly</td></tr><tr><td class=\"mono\">obj['m']()</td><td>yes — bracket access produces a reference</td></tr><tr><td class=\"mono\">(obj.m)()</td><td>yes — parens don't change order</td></tr><tr><td class=\"mono\">let f = obj.m</td><td>no — assignment</td></tr><tr><td class=\"mono\">run(obj.m)</td><td>no — passed as argument</td></tr><tr><td class=\"mono\">return obj.m</td><td>no — returned out</td></tr><tr><td class=\"mono\">(cond ? obj.m : obj.n)()</td><td>no — ternary</td></tr><tr><td class=\"mono\">(obj.m || obj.n)()</td><td>no — logical operator</td></tr></tbody></table></div>",
               "long": false,
               "tag": ""
             },
