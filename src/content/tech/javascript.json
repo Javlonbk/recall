@@ -2384,13 +2384,7 @@
             },
             {
               "question": "How do you check whether a property is own vs inherited?",
-              "answer": "<p class=\"answer-line\"><code>Object.hasOwn(obj, key)</code> — or the older <code>obj.hasOwnProperty(key)</code> — is <code>true</code> only when the key sits on the object itself. A plain read returns the first match anywhere on the chain, and <code>in</code> also searches the whole chain.</p><pre><code>const proto = { kind: \"animal\" };\nconst dog = Object.create(proto);\ndog.name = \"Rex\";\n\ndog.kind;                     // \"animal\"  -- inherited read\n\"kind\" in dog;                // true      -- `in` walks the chain\nObject.hasOwn(dog, \"kind\");   // false\nObject.hasOwn(dog, \"name\");   // true\ndog.hasOwnProperty(\"name\");   // true      -- same check, older form</code></pre>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "Why prefer Object.hasOwn over hasOwnProperty?",
-              "answer": "<p class=\"answer-line\"><code>hasOwnProperty</code> is itself inherited from <code>Object.prototype</code>, so it is missing on prototype-less objects and can be shadowed by an own key of the same name. <code>Object.hasOwn</code> (ES2022) is static and works on anything.</p><pre><code>const dict = Object.create(null);\ndict.x = 1;\n\n// dict.hasOwnProperty(\"x\");  // TypeError -- nothing inherited\nObject.hasOwn(dict, \"x\");     // true</code></pre>",
+              "answer": "<p class=\"answer-line\"><code>Object.hasOwn(obj, key)</code> — or the older <code>obj.hasOwnProperty(key)</code> — is <code>true</code> only when the key sits on the object itself. A plain read returns the first match anywhere on the chain, and <code>in</code> also searches the whole chain.</p><pre><code>const proto = { kind: \"animal\" };\nconst dog = Object.create(proto);\ndog.name = \"Rex\";\n\ndog.kind;                     // \"animal\"  -- inherited read\n\"kind\" in dog;                // true      -- `in` walks the chain\nObject.hasOwn(dog, \"kind\");   // false\nObject.hasOwn(dog, \"name\");   // true\ndog.hasOwnProperty(\"name\");   // true      -- same check, older form</code></pre><p>Prefer <code>Object.hasOwn</code> (ES2022): <code>hasOwnProperty</code> is itself inherited from <code>Object.prototype</code>, so it's missing on prototype-less objects (<code>Object.create(null)</code>) and can be shadowed by an own key of the same name.</p>",
               "long": false,
               "tag": ""
             },
@@ -2625,12 +2619,6 @@
             {
               "question": "What's the internal difference between a base and a derived constructor?",
               "answer": "<p class=\"answer-line\">A regular (base) constructor called with <code>new</code> creates an empty object as <code>this</code>. A derived one is marked <code>[[ConstructorKind]]: \"derived\"</code> and <b>skips</b> that step — it expects the base constructor to do it via <code>super()</code>.</p>",
-              "long": false,
-              "tag": ""
-            },
-            {
-              "question": "What error do you get if you use `this` before `super()` in a derived constructor?",
-              "answer": "<p class=\"answer-line\"><code>ReferenceError: this is not defined</code> — whether you skip <code>super()</code> entirely or touch <code>this</code> above it.</p>",
               "long": false,
               "tag": ""
             },
