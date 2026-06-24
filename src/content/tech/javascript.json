@@ -3272,7 +3272,7 @@
             },
             {
               "question": "Why isn't lazy .*? a universal fix?",
-              "answer": "<p class=\"answer-line\">Lazy <code>.*?</code> still expands across a delimiter if that's what makes the rest match — so it can glue together pieces of <b>two different tags</b>:</p>\n<pre><code>// matching <a href=\"...\" class=\"doc\">\n/<a href=\".*?\" class=\"doc\">/  // can span across a quote into another tag\n/<a href=\"[^\"]*\" class=\"doc\">/ // reliable — can't leave the attribute</code></pre>",
+              "answer": "<p class=\"answer-line\">Lazy <code>.*?</code> still expands across a delimiter if that's what makes the rest match — so it can glue together pieces of <b>two different tags</b>:</p>\n<pre><code>// matching &lt;a href=\"...\" class=\"doc\"&gt;\n/&lt;a href=\".*?\" class=\"doc\"&gt;/  // can span across a quote into another tag\n/&lt;a href=\"[^\"]*\" class=\"doc\"&gt;/ // reliable — can't leave the attribute</code></pre>",
               "long": false,
               "tag": ""
             }
