@@ -19,6 +19,11 @@ npm run build    # static output → dist/
 
 Built with [Astro](https://astro.build) as a fully static site.
 
+## Sources
+
+- [javascript.info](https://javascript.info) — primary reference for the JavaScript book & Q&A.
+- [greatfrontend/top-javascript-interview-questions](https://github.com/greatfrontend/top-javascript-interview-questions) — interview question set.
+
 ## License
 
 [MIT](./LICENSE) — © Javlonbek
